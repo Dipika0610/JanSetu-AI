@@ -8,7 +8,8 @@ import { AuthHub } from './components/auth/AuthHub';
 
 export function App() {
   const { currentUser } = useAuth();
-  const [activeView, setActiveView] = useState('citizen'); // 'citizen' | 'authority' | 'auth'
+  // By default, open the Login / Register screen ('auth')
+  const [activeView, setActiveView] = useState('auth'); // 'auth' | 'citizen' | 'authority'
 
   return (
     <div className="jansetu-app">
@@ -21,19 +22,19 @@ export function App() {
       )}
 
       {/* Main Views */}
+      {activeView === 'auth' && (
+        <AuthHub
+          onAuthenticated={(targetView) => setActiveView(targetView)}
+          onBack={() => setActiveView('auth')}
+        />
+      )}
+
       {activeView === 'citizen' && (
         <CitizenPortal onViewChange={setActiveView} />
       )}
 
       {activeView === 'authority' && (
         <AuthorityDashboard onViewChange={setActiveView} />
-      )}
-
-      {activeView === 'auth' && (
-        <AuthHub
-          onAuthenticated={(targetView) => setActiveView(targetView)}
-          onBack={() => setActiveView('citizen')}
-        />
       )}
 
       {/* Floating Toast System */}

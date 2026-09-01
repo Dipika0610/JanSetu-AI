@@ -24,12 +24,10 @@ export const Header = ({ activeView, onViewChange }) => {
   };
 
   const handleSwitchToOfficer = () => {
-    // If already logged in as staff, navigate directly
     if (currentUser?.type === 'staff') {
       onViewChange('authority');
       return;
     }
-    // Otherwise, require 8-digit security passcode 12345678
     setEnteredPasscode('');
     setPasscodeError('');
     setShowPasscodeModal(true);
@@ -58,40 +56,29 @@ export const Header = ({ activeView, onViewChange }) => {
             <span>{t('brandName')}</span>
             <span className="badge badge-blue" style={{ fontSize: '10px', padding: '1px 6px' }}>{t('sihBadge')}</span>
           </div>
-          <div className="ward-row">
-            <select
-              value={selectedWard}
-              onChange={(e) => {
-                setSelectedWard(e.target.value);
-                showToast(`${t('activeWard')}: ${e.target.value}`, 'info');
-              }}
-              className="ward-select"
-              title={t('activeWard')}
-            >
-              {WARDS.map(w => (
-                <option key={w.id} value={w.name}>{w.name}, Mumbai ▾</option>
-              ))}
-            </select>
-          </div>
+          {activeView !== 'auth' && (
+            <div className="ward-row">
+              <select
+                value={selectedWard}
+                onChange={(e) => {
+                  setSelectedWard(e.target.value);
+                  showToast(`${t('activeWard')}: ${e.target.value}`, 'info');
+                }}
+                className="ward-select"
+                title={t('activeWard')}
+              >
+                {WARDS.map(w => (
+                  <option key={w.id} value={w.name}>{w.name}, Mumbai ▾</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        {/* Direct Back / Login Navigation Button */}
-        {activeView === 'citizen' && (
-          <button
-            onClick={() => onViewChange('auth')}
-            className="lang-btn"
-            title="Go to Login / Register Hub"
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, background: 'var(--card)' }}
-          >
-            <ArrowLeft size={13} />
-            <span className="hidden-mobile">Login Hub</span>
-          </button>
-        )}
-
-        {/* User Account / Sign Out Section */}
-        {currentUser ? (
+        {/* User Account / Sign Out Section (When logged in and not on auth) */}
+        {currentUser && activeView !== 'auth' && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {/* User Dropdown */}
             <div style={{ position: 'relative' }}>
@@ -196,16 +183,6 @@ export const Header = ({ activeView, onViewChange }) => {
               <span style={{ fontWeight: 600 }}>{t('signOut')}</span>
             </button>
           </div>
-        ) : (
-          <button
-            onClick={() => onViewChange('auth')}
-            className="lang-btn"
-            title="Sign In / Register"
-            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
-          >
-            <User size={13} />
-            <span>{t('signIn')}</span>
-          </button>
         )}
 
         {/* Trilingual Language Dropdown */}
@@ -270,8 +247,8 @@ export const Header = ({ activeView, onViewChange }) => {
           )}
         </div>
 
-        {/* View Switch Button (Citizen <-> Officer) with Security Passcode */}
-        {activeView === 'citizen' ? (
+        {/* View Switch Button (Citizen <-> Officer) with Security Passcode (Only on citizen portal) */}
+        {activeView === 'citizen' && (
           <button
             onClick={handleSwitchToOfficer}
             className="portal-switch-btn"
@@ -281,26 +258,19 @@ export const Header = ({ activeView, onViewChange }) => {
             <span>{t('officer')}</span>
             <ArrowRight size={12} />
           </button>
-        ) : (
-          <button
-            onClick={() => onViewChange('citizen')}
-            className="portal-switch-btn"
-            title="Switch to Citizen Grievance Portal"
-          >
-            <span>{t('citizen')}</span>
-            <ArrowRight size={12} />
-          </button>
         )}
 
-        {/* Notification Bell */}
-        <div
-          className="bell"
-          title="Active civic alerts in your ward"
-          onClick={() => showToast('3 active work orders in progress in your ward.', 'info')}
-        >
-          <Bell size={16} />
-          <span className="dot"></span>
-        </div>
+        {/* Notification Bell (Only on citizen portal) */}
+        {activeView === 'citizen' && (
+          <div
+            className="bell"
+            title="Active civic alerts in your ward"
+            onClick={() => showToast('3 active work orders in progress in your ward.', 'info')}
+          >
+            <Bell size={16} />
+            <span className="dot"></span>
+          </div>
+        )}
       </div>
 
       {/* Official Security Passcode Verification Modal (12345678) */}

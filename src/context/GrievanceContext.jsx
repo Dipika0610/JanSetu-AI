@@ -186,23 +186,92 @@ export const GrievanceProvider = ({ children }) => {
   };
 
   /**
-   * Rate resolution
+   * Submit citizen feedback, rating & sentiment tags
    */
-  const rateResolution = (id, rating, feedback) => {
+  const submitFeedback = (id, { rating, feedbackText, tags = [] }) => {
     setComplaints(prev => {
       return prev.map(item => {
         if (item.id === id) {
           return {
             ...item,
             rating,
-            feedback,
-            status: 'closed'
+            feedback: feedbackText || 'Work completed to satisfaction.',
+            sentimentTags: tags,
+            feedbackSubmittedAt: new Date().toISOString(),
+            status: item.status === 'resolved' ? 'closed' : item.status
           };
         }
         return item;
       });
     });
-    showToast(`Resolution rated ${rating}★! Complaint #${id} closed.`, 'success');
+    showToast(`Feedback & ${rating}★ rating submitted! Thank you.`, 'success');
+  };
+
+  /**
+   * Authority reply on citizen feedback & dispatch completion alert
+   */
+  const replyToFeedback = (id, { replyText, officerName = 'S. Kulkarni (Ward Officer)', dispatchCompletionAlert = true }) => {
+    setComplaints(prev => {
+      return prev.map(item => {
+        if (item.id === id) {
+          const updated = {
+            ...item,
+            authorityReply: {
+              officerName,
+              replyText,
+              repliedAt: new Date().toISOString(),
+              alertDispatched: dispatchCompletionAlert
+            }
+          };
+
+          if (dispatchCompletionAlert) {
+            updated.completionAlert = {
+              id: `ALT-${Math.floor(1000 + Math.random() * 9000)}`,
+              title: 'Municipal Resolution & Completion Alert',
+              message: replyText || 'Grievance resolution verified and certified by Municipal Officer.',
+              time: 'Just now',
+              verifiedBy: officerName
+            };
+          }
+
+          return updated;
+        }
+        return item;
+      });
+    });
+    showToast(`Official reply & completion alert dispatched to citizen!`, 'success');
+  };
+
+  /**
+   * Dispatch standalone completion alert
+   */
+  const sendCompletionAlert = (id, { title = 'Work Order Completed', message, verifiedPhoto }) => {
+    setComplaints(prev => {
+      return prev.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            status: 'resolved',
+            completionAlert: {
+              id: `ALT-${Math.floor(1000 + Math.random() * 9000)}`,
+              title,
+              message: message || 'Work order completed and certified on-site.',
+              time: 'Just now',
+              verifiedPhoto: verifiedPhoto || item.photo
+            }
+          };
+        }
+        return item;
+      });
+    });
+    showToast(`Completion Alert dispatched to citizen #${id}!`, 'success');
+  };
+
+  /**
+   * Rate resolution (backward compatibility)
+   */
+  const rateResolution = (id, rating, feedback) => {
+    submitFeedback(id, { rating, feedbackText: feedback, tags: ['⚡ Fast Resolution'] });
   };
 
   /**

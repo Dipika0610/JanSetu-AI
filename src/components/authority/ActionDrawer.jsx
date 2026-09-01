@@ -1,0 +1,165 @@
+import React, { useState } from 'react';
+import { useGrievances } from '../../context/GrievanceContext';
+import { OFFICERS } from '../../data/mockData';
+import { Sparkles, X, Check, ArrowRight } from 'lucide-react';
+
+export const ActionDrawer = ({ complaint, onClose }) => {
+  const { updateComplaintStatus } = useGrievances();
+
+  const [assignedOfficer, setAssignedOfficer] = useState(complaint?.assignedTo || '');
+  const [status, setStatus] = useState(complaint?.status || 'assigned');
+  const [actionNotes, setActionNotes] = useState(complaint?.notes || '');
+
+  if (!complaint) return null;
+
+  const handleSave = () => {
+    updateComplaintStatus(complaint.id, {
+      assignedTo: assignedOfficer || null,
+      status: status,
+      notes: actionNotes || null
+    });
+    onClose();
+  };
+
+  return (
+    <div className="modal-backdrop open">
+      <div className="modal-card">
+        <div className="modal-header">
+          <div>
+            <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Grievance Details</h3>
+            <span style={{ fontSize: '11.5px', color: 'var(--ink-faint)', fontFamily: 'monospace' }}>
+              #{complaint.id}
+            </span>
+          </div>
+          <button type="button" className="btn-secondary" onClick={onClose} style={{ padding: '2px 8px' }}>
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          {/* Attached Photo */}
+          {complaint.photo && (
+            <div style={{ marginBottom: 14 }}>
+              <label className="field-label">Attached Photo Evidence</label>
+              <img
+                src={complaint.photo}
+                alt="Evidence"
+                style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--line)' }}
+              />
+            </div>
+          )}
+
+          {/* Citizen Description */}
+          <div style={{ marginBottom: 12 }}>
+            <label className="field-label">Citizen Description (Original Text)</label>
+            <div style={{ background: 'var(--paper)', padding: '10px 12px', borderRadius: '6px', fontSize: '13px', lineHeight: 1.4, border: '1px solid var(--line-strong)' }}>
+              "{complaint.original_text || complaint.title}"
+            </div>
+          </div>
+
+          {/* Normalized NLP Text */}
+          {complaint.normalized_text && (
+            <div style={{ marginBottom: 12 }}>
+              <label className="field-label" style={{ color: 'var(--blue)' }}>
+                <Sparkles size={11} style={{ display: 'inline', marginRight: 4 }} />
+                NLP Normalized Meaning ({complaint.language || 'English'})
+              </label>
+              <div style={{ background: 'var(--blue-soft)', color: 'var(--blue-dim)', padding: '8px 12px', borderRadius: '6px', fontSize: '12px', fontStyle: 'italic' }}>
+                {complaint.normalized_text}
+              </div>
+            </div>
+          )}
+
+          {/* Ward & Priority Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+            <div>
+              <label className="field-label">Ward &amp; Location</label>
+              <div style={{ fontSize: '12.5px', color: 'var(--ink-soft)', fontWeight: 500 }}>
+                {complaint.location || complaint.ward}
+              </div>
+            </div>
+            <div>
+              <label className="field-label">Priority Score (SIH Formula)</label>
+              <div className={`badge ${complaint.priority === 'Critical' || complaint.priority === 'High' ? 'badge-brick' : 'badge-ochre'}`} style={{ fontSize: '11.5px' }}>
+                {complaint.priority.toUpperCase()} (Score: {complaint.priorityScore} / 100)
+              </div>
+            </div>
+          </div>
+
+          {/* Explainable AI Details */}
+          {complaint.explanation && (
+            <div style={{ background: 'var(--paper)', borderRadius: 6, padding: '10px 12px', marginBottom: 14, fontSize: '11.8px' }}>
+              <strong style={{ color: 'var(--blue)' }}>Explainable AI Audit Rationale:</strong>
+              <ul style={{ paddingLeft: 16, marginTop: 4, color: 'var(--ink-soft)' }}>
+                {complaint.explanation.map((e, idx) => (
+                  <li key={idx}>{e}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Action Form */}
+          <div style={{ borderTop: '1px dashed var(--line)', paddingTop: 14, marginTop: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+              <div>
+                <label className="field-label" htmlFor="assignOfficerSelect">Assign Field Officer</label>
+                <select
+                  id="assignOfficerSelect"
+                  className="select-ctrl"
+                  style={{ width: '100%' }}
+                  value={assignedOfficer}
+                  onChange={(e) => setAssignedOfficer(e.target.value)}
+                >
+                  <option value="">-- Select Officer --</option>
+                  {OFFICERS.map(off => (
+                    <option key={off.id} value={off.name}>{off.name} ({off.designation.split('(')[0]})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="field-label" htmlFor="updateStatusSelect">Update Status</label>
+                <select
+                  id="updateStatusSelect"
+                  className="select-ctrl"
+                  style={{ width: '100%' }}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="submitted">Submitted</option>
+                  <option value="assigned">Assigned</option>
+                  <option value="investigation">Under Investigation</option>
+                  <option value="progress">Work In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                  <option value="escalated">Escalated to Commissioner</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="field-label" htmlFor="officerActionNotes">Officer Action Notes (Visible to citizen)</label>
+              <textarea
+                id="officerActionNotes"
+                rows="2"
+                placeholder="e.g. Field inspection team dispatched. Suction vehicle deployed."
+                value={actionNotes}
+                onChange={(e) => setActionNotes(e.target.value)}
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button type="button" className="btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="btn-primary" onClick={handleSave}>
+            <span>Save &amp; Dispatch Update</span>
+            <ArrowRight size={14} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

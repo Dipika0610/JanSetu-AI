@@ -1,0 +1,33 @@
+/* ==========================================================================
+   JanSetu AI Unified Master Stylesheet
+   Import Design System, Citizen, Authority and Auth CSS
+   ========================================================================== */
+
+@import '../css/design-system.css';
+@import '../css/citizen.css';
+@import '../css/authority.css';
+@import '../css/auth.css';
+
+/* Global resets for React root */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.jansetu-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+.hidden-mobile {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none;
+  }
+}

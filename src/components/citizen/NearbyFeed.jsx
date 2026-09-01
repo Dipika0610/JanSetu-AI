@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const NearbyFeed = () => {
-  const { complaints, selectedWard, joinCluster } = useGrievances();
+  const { complaints, joinCluster } = useGrievances();
+  const { t } = useLanguage();
   const [radius, setRadius] = useState('1000');
   const [votedIds, setVotedIds] = useState(new Set());
 
@@ -16,15 +18,15 @@ export const NearbyFeed = () => {
   return (
     <div className="animate-fade-in">
       <div className="nearby-filter-bar">
-        <span style={{ fontSize: '12px', color: 'var(--ink-soft)', fontWeight: 600 }}>Radius from your location:</span>
+        <span style={{ fontSize: '12px', color: 'var(--ink-soft)', fontWeight: 600 }}>{t('radiusFilter')}</span>
         <select
           className="distance-select"
           value={radius}
           onChange={(e) => setRadius(e.target.value)}
         >
-          <option value="500">Within 500 metres</option>
-          <option value="1000">Within 1 kilometre</option>
-          <option value="3000">Within 3 kilometres</option>
+          <option value="500">{t('within500m')}</option>
+          <option value="1000">{t('within1km')}</option>
+          <option value="3000">{t('within3km')}</option>
         </select>
       </div>
 
@@ -52,7 +54,7 @@ export const NearbyFeed = () => {
           {/* Citizen Pin */}
           <circle cx="205" cy="88" r="5" fill="#24425F" stroke="#fff" strokeWidth="2" />
           <text x="205" y="106" textAnchor="middle" fontFamily="IBM Plex Sans" fontSize="9.5" fill="#24425F" fontWeight="600">
-            You are here
+            {t('youAreHere')}
           </text>
         </svg>
       </div>
@@ -62,6 +64,7 @@ export const NearbyFeed = () => {
         {nearbyItems.map(item => {
           const dotColor = item.priority === 'Critical' || item.priority === 'High' ? 'var(--brick)' : item.priority === 'Medium' ? 'var(--ochre)' : 'var(--moss)';
           const hasVoted = votedIds.has(item.id);
+          const count = item.similarCount || item.upvotes || 1;
 
           return (
             <div key={item.id} className="nearby-item">
@@ -71,14 +74,14 @@ export const NearbyFeed = () => {
                 <div className="nearby-meta">{item.location} · {item.category} · {item.timeAgo || 'Recent'}</div>
               </div>
               <div className="nearby-count">
-                <span style={{ fontWeight: 600 }}>{item.similarCount || item.upvotes || 1} reports</span>
+                <span style={{ fontWeight: 600 }}>{count} {t('reportsCount')}</span>
                 <button
                   type="button"
                   className={`me-too-btn ${hasVoted ? 'voted' : ''}`}
                   disabled={hasVoted}
                   onClick={() => handleVote(item.id, item.clusterId)}
                 >
-                  {hasVoted ? '✓ Supported' : '+1 Me Too'}
+                  {hasVoted ? t('supported') : t('meToo')}
                 </button>
               </div>
             </div>

@@ -35,6 +35,7 @@ export const GrievanceProvider = ({ children }) => {
   });
 
   const [selectedDept, setSelectedDept] = useState('all');
+  const [clusterFilter, setClusterFilter] = useState('all'); // 'all' | 'grouped' | 'high' | 'major' | 'standalone'
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState([]);
 
@@ -234,6 +235,8 @@ export const GrievanceProvider = ({ children }) => {
         setSelectedWard,
         selectedDept,
         setSelectedDept,
+        clusterFilter,
+        setClusterFilter,
         searchQuery,
         setSearchQuery,
         toasts,

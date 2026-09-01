@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth, DEFAULT_CITIZEN, DEFAULT_OFFICER } from '../../context/AuthContext';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { WARDS } from '../../data/mockData';
 import { User, Shield, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export const AuthHub = ({ onAuthenticated }) => {
   const { loginCitizen, loginStaff } = useAuth();
   const { showToast } = useGrievances();
+  const { t } = useLanguage();
 
   const [roleMode, setRoleMode] = useState('citizen'); // 'citizen' | 'staff'
   const [citizenStep, setCitizenStep] = useState(1);
@@ -102,7 +104,7 @@ export const AuthHub = ({ onAuthenticated }) => {
           onClick={() => setRoleMode('citizen')}
         >
           <User size={15} />
-          <span>Citizen Access</span>
+          <span>{t('citizenAccess')}</span>
         </button>
         <button
           type="button"
@@ -110,7 +112,7 @@ export const AuthHub = ({ onAuthenticated }) => {
           onClick={() => setRoleMode('staff')}
         >
           <Shield size={15} />
-          <span>Municipal Staff</span>
+          <span>{t('municipalStaff')}</span>
         </button>
       </div>
 
@@ -120,8 +122,8 @@ export const AuthHub = ({ onAuthenticated }) => {
           <div className="lockup">
             <div className="mark">G</div>
             <div>
-              <div className="name">JanSetu Citizen Portal</div>
-              <div className="sub">Municipal Corporation · Mumbai</div>
+              <div className="name">{t('brandName')} {t('citizen')}</div>
+              <div className="sub">{t('subTitle')}</div>
             </div>
           </div>
 
@@ -129,12 +131,12 @@ export const AuthHub = ({ onAuthenticated }) => {
           {citizenStep === 1 && (
             <div className="animate-fade-in">
               <div className="progress"><i className="current"></i><i></i><i></i></div>
-              <h1>Let's get you registered</h1>
-              <p className="lede">Just your phone number to start — you'll verify it with a one-time code.</p>
+              <h1>{t('letsGetRegistered')}</h1>
+              <p className="lede">{t('citizenStep1Sub')}</p>
 
               <div className="card">
                 <div className="field">
-                  <label>Full name <span className="req">*</span></label>
+                  <label>{t('fullName')} <span className="req">*</span></label>
                   <input
                     type="text"
                     value={citizenName}
@@ -143,7 +145,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   />
                 </div>
                 <div className="field">
-                  <label>Mobile number <span className="req">*</span></label>
+                  <label>{t('mobileNumber')} <span className="req">*</span></label>
                   <div className="phone-row">
                     <input type="text" className="cc" value="+91" readOnly />
                     <input
@@ -168,14 +170,14 @@ export const AuthHub = ({ onAuthenticated }) => {
                     showToast(`OTP dispatched to +91 ${citizenPhone}`, 'info');
                   }}
                 >
-                  <span>Send verification code</span>
+                  <span>{t('sendOtp')}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
 
               {/* 1-Click Demo Citizen Login */}
               <div className="demo-accounts">
-                <div className="demo-title">⚡ 1-Click Quick Demo Login</div>
+                <div className="demo-title">{t('quickDemoLogin')}</div>
                 <div className="demo-btn-group">
                   <button
                     type="button"
@@ -186,7 +188,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                       onAuthenticated('citizen');
                     }}
                   >
-                    Log in as Karan M. (Citizen)
+                    {t('loginAsKaran')}
                   </button>
                 </div>
               </div>
@@ -197,12 +199,12 @@ export const AuthHub = ({ onAuthenticated }) => {
           {citizenStep === 2 && (
             <div className="animate-fade-in">
               <div className="progress"><i className="done"></i><i className="current"></i><i></i></div>
-              <h1>Enter the code</h1>
-              <p className="lede">We've sent a 4-digit code by SMS to <strong>+91 {citizenPhone}</strong>.</p>
+              <h1>{t('enterCode')}</h1>
+              <p className="lede">{t('sentCodeBySms')} <strong>+91 {citizenPhone}</strong>.</p>
 
               <div className="card">
                 <div className="field">
-                  <label>Verification code</label>
+                  <label>{t('verificationCode')}</label>
                   <div className="otp-row">
                     {[0, 1, 2, 3].map(idx => (
                       <input
@@ -217,7 +219,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   </div>
                   <div className="otp-meta">
                     <span className="timer">
-                      Code expires in {String(Math.floor(otpSeconds / 60)).padStart(2, '0')}:{String(otpSeconds % 60).padStart(2, '0')}
+                      {t('codeExpiresIn')} {String(Math.floor(otpSeconds / 60)).padStart(2, '0')}:{String(otpSeconds % 60).padStart(2, '0')}
                     </span>
                     <span
                       className="resend"
@@ -226,7 +228,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                         showToast('New 4-digit code dispatched via SMS.', 'info');
                       }}
                     >
-                      Resend code
+                      {t('resendCode')}
                     </span>
                   </div>
                 </div>
@@ -240,7 +242,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                     showToast('Phone verified successfully!', 'success');
                   }}
                 >
-                  <span>Verify &amp; continue</span>
+                  <span>{t('verifyContinue')}</span>
                   <CheckCircle2 size={16} />
                 </button>
                 <button
@@ -248,7 +250,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   className="btn-ghost"
                   onClick={() => setCitizenStep(1)}
                 >
-                  Change number
+                  {t('changeNumber')}
                 </button>
               </div>
             </div>
@@ -258,12 +260,12 @@ export const AuthHub = ({ onAuthenticated }) => {
           {citizenStep === 3 && (
             <div className="animate-fade-in">
               <div className="progress"><i className="done"></i><i className="done"></i><i className="current"></i></div>
-              <h1>Almost done</h1>
-              <p className="lede">This helps us route your complaints to the right municipal office, in your preferred language.</p>
+              <h1>{t('almostDone')}</h1>
+              <p className="lede">{t('citizenStep3Sub')}</p>
 
               <div className="card">
                 <div className="field">
-                  <label>Your home ward <span className="req">*</span></label>
+                  <label>{t('homeWard')} <span className="req">*</span></label>
                   <select
                     value={citizenWard}
                     onChange={(e) => setCitizenWard(e.target.value)}
@@ -275,7 +277,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                 </div>
 
                 <div className="field">
-                  <label>Preferred language <span className="req">*</span></label>
+                  <label>{t('preferredLang')} <span className="req">*</span></label>
                   <div className="lang-grid">
                     {['English', 'हिंदी', 'मराठी'].map(lang => (
                       <div
@@ -290,7 +292,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                 </div>
 
                 <div className="field">
-                  <label>Email <span className="optional-tag">(optional)</span></label>
+                  <label>{t('emailOptional')}</label>
                   <input
                     type="email"
                     value={citizenEmail}
@@ -304,7 +306,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   className="btn-primary"
                   onClick={handleCompleteCitizenReg}
                 >
-                  <span>Create account &amp; enter portal</span>
+                  <span>{t('createAccount')}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -319,8 +321,8 @@ export const AuthHub = ({ onAuthenticated }) => {
           <div className="lockup">
             <div className="mark">G</div>
             <div>
-              <div className="name">JanSetu Command Center</div>
-              <div className="sub">Municipal Staff &amp; Officer Management</div>
+              <div className="name">{t('brandName')} {t('officer')}</div>
+              <div className="sub">{t('subTitle')}</div>
             </div>
           </div>
 
@@ -338,7 +340,7 @@ export const AuthHub = ({ onAuthenticated }) => {
               }}
               onClick={() => setStaffTab('login')}
             >
-              Officer Sign In
+              {t('officerSignIn')}
             </button>
             <button
               type="button"
@@ -353,18 +355,18 @@ export const AuthHub = ({ onAuthenticated }) => {
               }}
               onClick={() => setStaffTab('register')}
             >
-              Staff Provisioning
+              {t('staffProvisioning')}
             </button>
           </div>
 
           {staffTab === 'login' && (
             <div className="animate-fade-in">
-              <h1>Officer sign in</h1>
-              <p className="lede">Sign in with your official municipal credentials to access the priority dispatch queue.</p>
+              <h1>{t('officerSignIn')}</h1>
+              <p className="lede">{t('officerSignInSub')}</p>
 
               <div className="card">
                 <div className="field">
-                  <label>Official email or Employee ID <span className="req">*</span></label>
+                  <label>{t('officialEmail')} <span className="req">*</span></label>
                   <input
                     type="text"
                     value={staffEmail}
@@ -373,7 +375,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   />
                 </div>
                 <div className="field">
-                  <label>Password <span className="req">*</span></label>
+                  <label>{t('password')} <span className="req">*</span></label>
                   <input type="password" value="••••••••" readOnly />
                 </div>
 
@@ -382,14 +384,14 @@ export const AuthHub = ({ onAuthenticated }) => {
                   className="btn-primary"
                   onClick={handleStaffLogin}
                 >
-                  <span>Sign In to Dashboard</span>
+                  <span>{t('btnSignInDashboard')}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
 
               {/* 1-Click Demo Officer Logins */}
               <div className="demo-accounts">
-                <div className="demo-title">⚡ 1-Click Demo Officer Logins</div>
+                <div className="demo-title">{t('quickDemoLogin')}</div>
                 <div className="demo-btn-group" style={{ flexDirection: 'column', gap: 6 }}>
                   <button
                     type="button"
@@ -400,7 +402,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                       onAuthenticated('authority');
                     }}
                   >
-                    Login as S. Kulkarni (Ward Officer · Andheri W)
+                    {t('demoOfficerKulkarni')}
                   </button>
                   <button
                     type="button"
@@ -419,7 +421,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                       onAuthenticated('authority');
                     }}
                   >
-                    Login as JE Nilesh Patil (Sanitation · Andheri W)
+                    {t('demoOfficerPatil')}
                   </button>
                 </div>
               </div>
@@ -428,17 +430,17 @@ export const AuthHub = ({ onAuthenticated }) => {
 
           {staffTab === 'register' && (
             <div className="animate-fade-in">
-              <h1>Provision staff account</h1>
-              <p className="lede">Staff accounts are authorized by a ward administrator.</p>
+              <h1>{t('provisionStaffTitle')}</h1>
+              <p className="lede">{t('provisionStaffSub')}</p>
 
               <div className="admin-banner">
                 <AlertCircle size={17} />
-                <span>You're creating this account as an administrator. The employee will receive login credentials at their official email.</span>
+                <span>{t('adminBannerText')}</span>
               </div>
 
               <div className="card">
                 <div className="field">
-                  <label>Full name <span className="req">*</span></label>
+                  <label>{t('fullName')} <span className="req">*</span></label>
                   <input
                     type="text"
                     value={staffName}
@@ -447,7 +449,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   />
                 </div>
                 <div className="field">
-                  <label>Employee ID <span className="req">*</span></label>
+                  <label>{t('employeeId')} <span className="req">*</span></label>
                   <input
                     type="text"
                     value={staffEmpId}
@@ -456,7 +458,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   />
                 </div>
                 <div className="field">
-                  <label>Department <span className="req">*</span></label>
+                  <label>{t('departmentLabel')} <span className="req">*</span></label>
                   <select
                     value={staffDept}
                     onChange={(e) => setStaffDept(e.target.value)}
@@ -469,7 +471,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   </select>
                 </div>
                 <div className="field">
-                  <label>Ward of jurisdiction <span className="req">*</span></label>
+                  <label>{t('jurisdictionWard')} <span className="req">*</span></label>
                   <select
                     value={staffWard}
                     onChange={(e) => setStaffWard(e.target.value)}
@@ -480,7 +482,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   </select>
                 </div>
                 <div className="field">
-                  <label>Access level <span className="req">*</span></label>
+                  <label>{t('accessLevel')} <span className="req">*</span></label>
                   <div className="role-options">
                     {['Field officer', 'Ward supervisor', 'Admin'].map(role => (
                       <label
@@ -507,7 +509,7 @@ export const AuthHub = ({ onAuthenticated }) => {
                   className="btn-primary"
                   onClick={handleStaffRegister}
                 >
-                  <span>Create staff account</span>
+                  <span>{t('createStaffBtn')}</span>
                   <CheckCircle2 size={16} />
                 </button>
               </div>

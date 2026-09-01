@@ -1,9 +1,11 @@
 import React from 'react';
 import { ListOrdered, GitMerge, MapPin, ExternalLink } from 'lucide-react';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const MobileBottomNav = ({ activeSection, onSectionChange, onViewChange }) => {
   const { complaints } = useGrievances();
+  const { t } = useLanguage();
   const openCount = complaints.filter(c => c.status !== 'resolved' && c.status !== 'closed').length;
 
   return (
@@ -14,7 +16,7 @@ export const MobileBottomNav = ({ activeSection, onSectionChange, onViewChange }
           onClick={() => onSectionChange('queue')}
         >
           <ListOrdered size={18} />
-          <span>Queue</span>
+          <span>{t('priorityQueue')}</span>
           <span className="mobile-nav-badge">{openCount}</span>
         </button>
 
@@ -23,7 +25,7 @@ export const MobileBottomNav = ({ activeSection, onSectionChange, onViewChange }
           onClick={() => onSectionChange('clusters')}
         >
           <GitMerge size={18} />
-          <span>Clusters</span>
+          <span>{t('duplicateClusters')}</span>
         </button>
 
         <button
@@ -31,7 +33,7 @@ export const MobileBottomNav = ({ activeSection, onSectionChange, onViewChange }
           onClick={() => onSectionChange('map')}
         >
           <MapPin size={18} />
-          <span>Hotspots</span>
+          <span>{t('hotspotMap')}</span>
         </button>
 
         <button
@@ -39,7 +41,7 @@ export const MobileBottomNav = ({ activeSection, onSectionChange, onViewChange }
           onClick={() => onViewChange('citizen')}
         >
           <ExternalLink size={18} />
-          <span>Citizen</span>
+          <span>{t('citizen')}</span>
         </button>
       </div>
     </nav>

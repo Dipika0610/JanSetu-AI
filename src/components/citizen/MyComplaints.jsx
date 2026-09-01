@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Clock, CheckCircle, AlertCircle, Share2, Star, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const MyComplaints = () => {
   const { complaints, rateResolution, reopenComplaint, showToast } = useGrievances();
   const { currentUser } = useAuth();
+  const { t } = useLanguage();
   const [expandedAiId, setExpandedAiId] = useState(null);
 
   // Filter complaints belonging to current user or top relevant
@@ -46,9 +48,9 @@ export const MyComplaints = () => {
   if (myReports.length === 0) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--ink-soft)' }}>
-        <p style={{ fontSize: '15px', fontWeight: 600 }}>No complaints filed yet</p>
+        <p style={{ fontSize: '15px', fontWeight: 600 }}>{t('noComplaintsYet')}</p>
         <p style={{ fontSize: '12.5px', color: 'var(--ink-faint)', marginTop: 4 }}>
-          When you report an issue, you can track its real-time AI classification, department assignment, and resolution here.
+          {t('noComplaintsSub')}
         </p>
       </div>
     );
@@ -76,27 +78,27 @@ export const MyComplaints = () => {
             <div className="stepper">
               <div className={`step ${stepIdx >= 0 ? 'done' : ''} ${stepIdx === 0 ? 'current' : ''}`}>
                 <div className="step-dot"></div>
-                <div className="step-label">Submitted</div>
+                <div className="step-label">{t('stepSubmitted')}</div>
               </div>
               <div className={`step ${stepIdx >= 1 ? 'done' : ''} ${stepIdx === 1 ? 'current' : ''}`}>
                 <div className="step-line"></div>
                 <div className="step-dot"></div>
-                <div className="step-label">AI Routed</div>
+                <div className="step-label">{t('stepAiProcessed')}</div>
               </div>
               <div className={`step ${stepIdx >= 2 ? 'done' : ''} ${stepIdx === 2 ? 'current' : ''}`}>
                 <div className="step-line"></div>
                 <div className="step-dot"></div>
-                <div className="step-label">Assigned</div>
+                <div className="step-label">{t('stepAssigned')}</div>
               </div>
               <div className={`step ${stepIdx >= 3 ? 'done' : ''} ${stepIdx === 3 ? 'current' : ''}`}>
                 <div className="step-line"></div>
                 <div className="step-dot"></div>
-                <div className="step-label">In Progress</div>
+                <div className="step-label">{t('stepInProgress')}</div>
               </div>
               <div className={`step ${stepIdx >= 4 ? 'done' : ''} ${stepIdx === 4 ? 'current' : ''}`}>
                 <div className="step-line"></div>
                 <div className="step-dot"></div>
-                <div className="step-label">Resolved</div>
+                <div className="step-label">{t('stepResolved')}</div>
               </div>
             </div>
 
@@ -104,17 +106,17 @@ export const MyComplaints = () => {
             {item.similarCount > 1 && (
               <div className="similar-note">
                 <Clock size={14} />
-                <span>Grouped with {item.similarCount - 1} other citizen reports — raised priority to {item.priority.toUpperCase()}</span>
+                <span>{t('groupedWith')} {item.similarCount - 1} {t('otherReports')} {item.priority.toUpperCase()}</span>
               </div>
             )}
 
             {/* Officer Assignment Info */}
             <div style={{ fontSize: '11.8px', color: 'var(--ink-soft)', marginTop: 10, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
               <div>
-                <strong>Assigned to:</strong> {item.assignedTo || 'Ward Dispatch Engine'} ({item.department})
+                <strong>{t('assignedTo')}:</strong> {item.assignedTo || 'Ward Dispatch Engine'} ({item.department})
               </div>
               <div>
-                <strong>Priority:</strong> <span style={{ color: item.priority === 'Critical' ? 'var(--brick)' : item.priority === 'High' ? 'var(--brick-dim)' : 'var(--moss)', fontWeight: 600 }}>{item.priority} (Score {item.priorityScore})</span>
+                <strong>{t('priority')}:</strong> <span style={{ color: item.priority === 'Critical' ? 'var(--brick)' : item.priority === 'High' ? 'var(--brick-dim)' : 'var(--moss)', fontWeight: 600 }}>{item.priority} (Score {item.priorityScore})</span>
               </div>
             </div>
 
@@ -127,20 +129,20 @@ export const MyComplaints = () => {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--blue-soft)', color: 'var(--blue)', border: 'none' }}
               >
                 <Sparkles size={12} />
-                <span>Explainable AI Insights</span>
+                <span>{t('explainableAiBtn')}</span>
                 {isAiExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               </button>
 
               {isAiExpanded && (
                 <div className="animate-fade-in" style={{ background: 'var(--paper)', borderRadius: 6, padding: '10px 12px', marginTop: 8, fontSize: '12px' }}>
-                  <div style={{ fontWeight: 600, color: 'var(--blue)', marginBottom: 4 }}>Why Priority is {item.priority}:</div>
+                  <div style={{ fontWeight: 600, color: 'var(--blue)', marginBottom: 4 }}>{t('whyPriorityIs')} {item.priority}:</div>
                   <ul style={{ paddingLeft: 16, marginBottom: 8, color: 'var(--ink-soft)' }}>
                     {(item.explanation || ['Location sensitivity verified.', 'Category matched to civic department.']).map((exp, i) => (
                       <li key={i}>{exp}</li>
                     ))}
                   </ul>
 
-                  <div style={{ fontWeight: 600, color: 'var(--blue)', marginBottom: 4 }}>Recommended Municipal Actions:</div>
+                  <div style={{ fontWeight: 600, color: 'var(--blue)', marginBottom: 4 }}>{t('recommendedActions')}:</div>
                   <ul style={{ paddingLeft: 16, color: 'var(--ink-soft)' }}>
                     {(item.recommended_action || ['Inspect site.', 'Assign technician.']).map((act, i) => (
                       <li key={i}>{act}</li>
@@ -154,7 +156,7 @@ export const MyComplaints = () => {
             <div className="ticket-actions">
               {item.status === 'resolved' ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ fontSize: '11px', color: 'var(--ink-soft)' }}>Rate Fix:</span>
+                  <span style={{ fontSize: '11px', color: 'var(--ink-soft)' }}>{t('rateFix')}:</span>
                   {[1, 2, 3, 4, 5].map(star => (
                     <Star
                       key={star}
@@ -168,13 +170,13 @@ export const MyComplaints = () => {
 
               {item.status === 'resolved' || item.status === 'closed' ? (
                 <button className="ticket-action-btn" onClick={() => handleReopen(item.id)}>
-                  Reopen Appeal
+                  {t('reopenAppeal')}
                 </button>
               ) : null}
 
               <button className="ticket-action-btn" onClick={() => handleShare(item.id)}>
                 <Share2 size={11} style={{ display: 'inline', marginRight: 3 }} />
-                Share Tracking Link
+                {t('shareLink')}
               </button>
             </div>
           </div>

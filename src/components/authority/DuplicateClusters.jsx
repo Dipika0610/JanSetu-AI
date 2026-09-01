@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const DuplicateClusters = () => {
   const { clusters, mergeCluster } = useGrievances();
+  const { t } = useLanguage();
   const [openClusterId, setOpenClusterId] = useState(null);
 
   const toggleCluster = (id) => {
@@ -12,8 +14,8 @@ export const DuplicateClusters = () => {
   return (
     <div className="panel" id="duplicateClustersPanel">
       <div className="panel-head">
-        <h2>Duplicate clusters</h2>
-        <span className="hint">Grouped by semantic AI embeddings</span>
+        <h2>{t('clusterPanelTitle')}</h2>
+        <span className="hint">{t('clusterPanelSub')}</span>
       </div>
 
       <div className="cluster-list">
@@ -26,12 +28,12 @@ export const DuplicateClusters = () => {
                 <div>
                   <div className="cluster-title">{cluster.title}</div>
                   <div className="cluster-sub">
-                    {cluster.ward} · {cluster.department} · {cluster.similarityScore}% similarity
+                    {cluster.ward} · {cluster.department} · {cluster.similarityScore}% {t('clusterSimilarity')}
                   </div>
                 </div>
                 <div className="cluster-count">
                   {cluster.count}
-                  <span className="cluster-count-label">reports</span>
+                  <span className="cluster-count-label">{t('reportsCount')}</span>
                 </div>
               </div>
 
@@ -53,7 +55,7 @@ export const DuplicateClusters = () => {
                   disabled={cluster.isMerged}
                   onClick={() => mergeCluster(cluster.id)}
                 >
-                  {cluster.isMerged ? '✓ Merged & Dispatched' : 'Confirm Merge & Assign (1 Work Order)'}
+                  {cluster.isMerged ? t('btnMergedDone') : t('btnConfirmMerge')}
                 </button>
               </div>
             </div>

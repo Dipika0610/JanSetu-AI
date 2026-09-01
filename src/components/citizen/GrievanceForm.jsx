@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { classifyComplaint, findPotentialDuplicates } from '../../services/aiEngine';
 import { Camera, Mic, MapPin, Send, CheckCircle2, AlertTriangle, X, Sparkles } from 'lucide-react';
 
 export const GrievanceForm = ({ onSubmitted }) => {
   const { complaints, selectedWard, submitComplaint, joinCluster, showToast } = useGrievances();
+  const { lang, t } = useLanguage();
 
   const [description, setDescription] = useState('');
   const [locationText, setLocationText] = useState(`Near Link Road bus stop, ${selectedWard}`);
@@ -47,7 +49,7 @@ export const GrievanceForm = ({ onSubmitted }) => {
   const handleVoiceInput = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       setIsListening(true);
-      showToast('Simulating multilingual speech recognition...', 'info');
+      showToast(t('voiceListening'), 'info');
       setTimeout(() => {
         const samples = [
           'Drainage overflow ho raha hai station ke bahar, paani pura sadak par aa gaya hai.',
@@ -64,11 +66,11 @@ export const GrievanceForm = ({ onSubmitted }) => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.lang = 'hi-IN';
+    recognition.lang = lang === 'hi' ? 'hi-IN' : lang === 'mr' ? 'mr-IN' : 'en-IN';
     recognition.continuous = false;
 
     setIsListening(true);
-    showToast('Listening in Hindi/Marathi/English... Speak now.', 'info');
+    showToast(t('voiceListening'), 'info');
     recognition.start();
 
     recognition.onresult = (event) => {
@@ -161,14 +163,14 @@ export const GrievanceForm = ({ onSubmitted }) => {
       <form onSubmit={handleSubmit}>
         {/* Photo Drop Area */}
         <span className="field-label">
-          <span>Photo (optional, helps AI verify faster)</span>
-          {attachedPhoto && <span className="badge badge-moss">AI Verified</span>}
+          <span>{t('photoLabel')}</span>
+          {attachedPhoto && <span className="badge badge-moss">{t('photoVerified')}</span>}
         </span>
 
         {!attachedPhoto ? (
           <div className="photo-drop" onClick={() => fileInputRef.current.click()}>
             <Camera size={24} style={{ marginBottom: 6, color: 'var(--ink-faint)' }} />
-            <div>Tap to add a photo or drag image</div>
+            <div>{t('photoDropText')}</div>
             <input
               ref={fileInputRef}
               type="file"
@@ -181,13 +183,13 @@ export const GrievanceForm = ({ onSubmitted }) => {
           <div className="photo-preview-box" style={{ display: 'block' }}>
             <img src={attachedPhoto} alt="Attached Evidence" />
             <div className="photo-preview-overlay">
-              <span>Visual evidence attached</span>
+              <span>{t('photoEvidenceAttached')}</span>
               <button
                 type="button"
                 className="remove-photo-btn"
                 onClick={() => setAttachedPhoto(null)}
               >
-                Remove
+                {t('removePhoto')}
               </button>
             </div>
           </div>
@@ -195,14 +197,14 @@ export const GrievanceForm = ({ onSubmitted }) => {
 
         {/* Text Input with Voice Mic */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
-          <label className="field-label" style={{ marginBottom: 0 }}>Description</label>
-          <span style={{ fontSize: '11px', color: 'var(--ink-faint)' }}>Multilingual AI Active</span>
+          <label className="field-label" style={{ marginBottom: 0 }}>{t('descriptionLabel')}</label>
+          <span style={{ fontSize: '11px', color: 'var(--ink-faint)' }}>{t('multilingualActive')}</span>
         </div>
 
         <div className="textarea-wrapper">
           <textarea
             rows="4"
-            placeholder="e.g. Sewage line ke paas paani jama ho gaya hai, bahot badbu aa rahi hai... / रस्त्यावरील दिवा बंद आहे..."
+            placeholder={t('descriptionPlaceholder')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           ></textarea>
@@ -210,7 +212,7 @@ export const GrievanceForm = ({ onSubmitted }) => {
             type="button"
             className={`voice-mic-btn ${isListening ? 'listening' : ''}`}
             onClick={handleVoiceInput}
-            title="Speak in Hindi/Marathi/English to dictate"
+            title={t('voiceListening')}
           >
             <Mic size={15} />
           </button>
@@ -218,10 +220,10 @@ export const GrievanceForm = ({ onSubmitted }) => {
 
         {/* Real-Time Detection Badge */}
         <div className="detect-row">
-          <span>Detected as</span>
+          <span>{t('detectedAs')}</span>
           <span className={`detect-badge badge-${detectedCategory.categoryName === 'Drainage' || detectedCategory.categoryName === 'Garbage' ? 'moss' : detectedCategory.categoryName === 'Water supply' ? 'blue' : 'ochre'}`}>
             <CheckCircle2 size={12} />
-            <span>{detectedCategory.categoryName} ({Math.round(detectedCategory.confidence * 100)}% confidence)</span>
+            <span>{detectedCategory.categoryName} ({Math.round(detectedCategory.confidence * 100)}% {t('confidence')})</span>
           </span>
         </div>
 
@@ -230,7 +232,7 @@ export const GrievanceForm = ({ onSubmitted }) => {
           <div className="dup-alert animate-fade-in">
             <div className="dup-alert-head">
               <AlertTriangle size={16} />
-              <span>Looks like this may already be reported</span>
+              <span>{t('dupAlertTitle')}</span>
             </div>
             <p>{duplicateCandidate.message}</p>
             <div className="dup-actions">
@@ -243,34 +245,34 @@ export const GrievanceForm = ({ onSubmitted }) => {
                   if (onSubmitted) onSubmitted(duplicateCandidate.matchedComplaint);
                 }}
               >
-                Yes, same issue — add my report (+1 Upvote)
+                {t('btnJoinCluster')}
               </button>
               <button
                 type="button"
                 className="btn-small btn-new"
                 onClick={() => setDuplicateCandidate(null)}
               >
-                No, this is different
+                {t('btnIgnoreDup')}
               </button>
             </div>
           </div>
         )}
 
         {/* Location Row */}
-        <label className="field-label" style={{ marginTop: 14 }}>Location</label>
+        <label className="field-label" style={{ marginTop: 14 }}>{t('locationLabel')}</label>
         <div className="location-row" onClick={() => setShowLocationModal(true)}>
           <MapPin size={16} />
           <div style={{ flex: 1 }}>
             <div className="loc-text">{locationText}</div>
-            <div className="loc-sub">{selectedWard} · using GPS coordinates</div>
+            <div className="loc-sub">{selectedWard} · {t('locationUsingGps')}</div>
           </div>
-          <div className="change">Change</div>
+          <div className="change">{t('change')}</div>
         </div>
 
         {/* Submit CTA Button */}
         <button type="submit" className="submit-btn" disabled={isSubmitting}>
           <Send size={16} />
-          <span>{isSubmitting ? 'Processing AI Pipeline...' : 'Submit report'}</span>
+          <span>{isSubmitting ? t('processingAI') : t('btnSubmitReport')}</span>
         </button>
       </form>
 
@@ -279,7 +281,7 @@ export const GrievanceForm = ({ onSubmitted }) => {
         <div className="modal-backdrop open">
           <div className="modal-card">
             <div className="modal-header">
-              <h3>Select Location &amp; Ward</h3>
+              <h3>{t('locationLabel')} &amp; {t('colWard')}</h3>
               <button type="button" className="btn-secondary" onClick={() => setShowLocationModal(false)}>✕</button>
             </div>
             <div className="modal-body">

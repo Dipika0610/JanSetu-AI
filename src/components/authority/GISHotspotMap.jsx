@@ -1,8 +1,10 @@
 import React from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const GISHotspotMap = () => {
   const { selectedWard, setSelectedWard, showToast } = useGrievances();
+  const { t } = useLanguage();
 
   const handleWardNodeClick = (wardName) => {
     setSelectedWard(wardName);
@@ -12,8 +14,8 @@ export const GISHotspotMap = () => {
   return (
     <div className="panel" id="hotspotMapPanel">
       <div className="panel-head">
-        <h2>Complaint hotspots</h2>
-        <span className="hint">By ward, real-time density</span>
+        <h2>{t('hotspotTitle')}</h2>
+        <span className="hint">{t('hotspotSub')}</span>
       </div>
       <div className="map-wrap">
         <div className="map-svg-wrap">
@@ -115,9 +117,9 @@ export const GISHotspotMap = () => {
         </div>
 
         <div className="legend">
-          <span><i style={{ background: 'var(--brick)' }}></i>High density (&gt;40)</span>
-          <span><i style={{ background: 'var(--ochre)' }}></i>Moderate (30-40)</span>
-          <span><i style={{ background: 'var(--moss)' }}></i>Low (&lt;30)</span>
+          <span><i style={{ background: 'var(--brick)' }}></i>{t('densityHigh')}</span>
+          <span><i style={{ background: 'var(--ochre)' }}></i>{t('densityMod')}</span>
+          <span><i style={{ background: 'var(--moss)' }}></i>{t('densityLow')}</span>
         </div>
       </div>
     </div>

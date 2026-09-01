@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { WARDS } from '../../data/mockData';
-import { Bell, ArrowRight, User, Globe, LogOut, ChevronDown } from 'lucide-react';
+import { Bell, ArrowRight, User, Globe, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
 
 export const Header = ({ activeView, onViewChange }) => {
   const { currentUser, logout, isOfficer } = useAuth();
@@ -22,117 +22,163 @@ export const Header = ({ activeView, onViewChange }) => {
 
   return (
     <header className="topbar">
-      <div className="brand-mark" title="JanSetu AI Civic Intelligence">G</div>
-      <div className="brand-text">
-        <div className="name">
-          <span>{t('brandName')}</span>
-          <span className="badge badge-blue" style={{ fontSize: '10px', padding: '1px 6px' }}>{t('sihBadge')}</span>
-        </div>
-        <div className="ward-row">
-          <select
-            value={selectedWard}
-            onChange={(e) => {
-              setSelectedWard(e.target.value);
-              showToast(`${t('activeWard')}: ${e.target.value}`, 'info');
-            }}
-            className="ward-select"
-            title={t('activeWard')}
-          >
-            {WARDS.map(w => (
-              <option key={w.id} value={w.name}>{w.name}, Mumbai ▾</option>
-            ))}
-          </select>
+      {/* Brand & Active Ward */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="brand-mark" title="JanSetu AI Civic Intelligence">G</div>
+        <div className="brand-text">
+          <div className="name">
+            <span>{t('brandName')}</span>
+            <span className="badge badge-blue" style={{ fontSize: '10px', padding: '1px 6px' }}>{t('sihBadge')}</span>
+          </div>
+          <div className="ward-row">
+            <select
+              value={selectedWard}
+              onChange={(e) => {
+                setSelectedWard(e.target.value);
+                showToast(`${t('activeWard')}: ${e.target.value}`, 'info');
+              }}
+              className="ward-select"
+              title={t('activeWard')}
+            >
+              {WARDS.map(w => (
+                <option key={w.id} value={w.name}>{w.name}, Mumbai ▾</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="header-actions">
-        {/* User Account / Sign Out Menu */}
-        <div style={{ position: 'relative' }}>
+      <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* Direct Back / Login Navigation Button */}
+        {activeView === 'citizen' && (
           <button
-            onClick={() => setShowUserMenu(!showUserMenu)}
+            onClick={() => onViewChange('auth')}
             className="lang-btn"
-            title="Account Menu"
+            title="Go to Login / Register Hub"
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, background: 'var(--card)' }}
+          >
+            <ArrowLeft size={13} />
+            <span className="hidden-mobile">Login Hub</span>
+          </button>
+        )}
+
+        {/* User Account / Sign Out Section */}
+        {currentUser ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {/* User Dropdown */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="lang-btn"
+                title="Account Menu"
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <User size={13} />
+                <span>{currentUser.name ? currentUser.name.split(' ')[0] : 'User'}</span>
+                <ChevronDown size={11} />
+              </button>
+
+              {showUserMenu && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: 6,
+                    background: 'var(--card)',
+                    border: '1px solid var(--line)',
+                    borderRadius: 8,
+                    boxShadow: 'var(--shadow-md)',
+                    minWidth: 170,
+                    zIndex: 100,
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--line)', fontSize: '11.5px', color: 'var(--ink-soft)' }}>
+                    <strong>{currentUser.name}</strong>
+                    <div style={{ fontSize: '10.5px', color: 'var(--ink-faint)' }}>{currentUser.phone || currentUser.email || currentUser.type}</div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      onViewChange('auth');
+                    }}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      color: 'var(--ink)'
+                    }}
+                  >
+                    <User size={13} />
+                    <span>{t('switchUser')}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '8px 12px',
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      color: 'var(--brick)',
+                      borderTop: '1px solid var(--line)'
+                    }}
+                  >
+                    <LogOut size={13} />
+                    <span style={{ fontWeight: 600 }}>{t('signOut')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Direct 1-Click Sign Out Button in Topbar */}
+            <button
+              onClick={handleSignOut}
+              className="lang-btn"
+              title="1-Click Sign Out"
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                color: 'var(--brick)',
+                borderColor: 'var(--brick-dim)',
+                background: 'var(--card)'
+              }}
+            >
+              <LogOut size={13} />
+              <span style={{ fontWeight: 600 }}>{t('signOut')}</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => onViewChange('auth')}
+            className="lang-btn"
+            title="Sign In / Register"
             style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
           >
             <User size={13} />
-            <span>{currentUser ? currentUser.name.split(' ')[0] : t('signIn')}</span>
-            <ChevronDown size={11} />
+            <span>{t('signIn')}</span>
           </button>
-
-          {showUserMenu && (
-            <div
-              className="animate-fade-in"
-              style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: 6,
-                background: 'var(--card)',
-                border: '1px solid var(--line)',
-                borderRadius: 8,
-                boxShadow: 'var(--shadow-md)',
-                minWidth: 160,
-                zIndex: 100,
-                overflow: 'hidden'
-              }}
-            >
-              {currentUser && (
-                <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--line)', fontSize: '11.5px', color: 'var(--ink-soft)' }}>
-                  <strong>{currentUser.name}</strong>
-                  <div style={{ fontSize: '10.5px', color: 'var(--ink-faint)' }}>{currentUser.role || currentUser.type}</div>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowUserMenu(false);
-                  onViewChange('auth');
-                }}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '8px 12px',
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  color: 'var(--ink)'
-                }}
-              >
-                <User size={13} />
-                <span>{t('switchUser')}</span>
-              </button>
-
-              {currentUser && (
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '8px 12px',
-                    background: 'none',
-                    border: 'none',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    color: 'var(--brick)',
-                    borderTop: '1px solid var(--line)'
-                  }}
-                >
-                  <LogOut size={13} />
-                  <span style={{ fontWeight: 600 }}>{t('signOut')}</span>
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Trilingual Language Dropdown */}
         <div style={{ position: 'relative' }}>
@@ -196,7 +242,7 @@ export const Header = ({ activeView, onViewChange }) => {
           )}
         </div>
 
-        {/* View Switch Button */}
+        {/* View Switch Button (Citizen <-> Officer) */}
         {activeView === 'citizen' ? (
           <button
             onClick={() => onViewChange('authority')}

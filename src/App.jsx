@@ -22,7 +22,7 @@ export function App() {
 
       {/* Main Views */}
       {activeView === 'citizen' && (
-        <CitizenPortal />
+        <CitizenPortal onViewChange={setActiveView} />
       )}
 
       {activeView === 'authority' && (
@@ -30,7 +30,10 @@ export function App() {
       )}
 
       {activeView === 'auth' && (
-        <AuthHub onAuthenticated={(targetView) => setActiveView(targetView)} />
+        <AuthHub
+          onAuthenticated={(targetView) => setActiveView(targetView)}
+          onBack={() => setActiveView('citizen')}
+        />
       )}
 
       {/* Floating Toast System */}

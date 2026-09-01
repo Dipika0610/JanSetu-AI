@@ -1,23 +1,115 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { GrievanceForm } from './GrievanceForm';
 import { MyComplaints } from './MyComplaints';
 import { NearbyFeed } from './NearbyFeed';
 import { DemoScenarios } from './DemoScenarios';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles, User, LogOut, ArrowLeft } from 'lucide-react';
 
-export const CitizenPortal = () => {
-  const { complaints } = useGrievances();
-  const { t } = useLanguage();
+export const CitizenPortal = ({ onViewChange }) => {
+  const { currentUser, logout } = useAuth();
+  const { complaints, showToast } = useGrievances();
+  const { lang, t } = useLanguage();
   const [activeTab, setActiveTab] = useState('submit');
 
   const myCount = complaints.filter(c => c.similarCount > 0 || c.id.startsWith('GRV-2026-0001')).length;
 
+  const handleSignOut = () => {
+    logout();
+    showToast(lang === 'hi' ? 'सफलतापूर्वक साइन आउट किया गया।' : lang === 'mr' ? 'यशस्वीरित्या साइन आउट केले.' : 'Signed out successfully.', 'info');
+    if (onViewChange) onViewChange('auth');
+  };
+
   return (
     <div className="shell">
+      {/* Citizen Profile & Back/SignOut Action Strip */}
+      <div
+        className="user-profile-strip animate-fade-in"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '8px 18px',
+          background: 'var(--card)',
+          borderBottom: '1px solid var(--line)',
+          fontSize: '12px',
+          color: 'var(--ink-soft)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: '50%',
+              background: 'var(--blue)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: '11px'
+            }}
+          >
+            {currentUser?.name ? currentUser.name[0] : 'C'}
+          </div>
+          <div>
+            <strong style={{ color: 'var(--ink)' }}>{currentUser?.name || 'Citizen'}</strong>
+            <span style={{ color: 'var(--ink-faint)', marginLeft: 6 }}>
+              ({currentUser?.phone || '+91 98201 44520'})
+            </span>
+          </div>
+        </div>
+
+        {/* Back & Sign Out Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={() => onViewChange && onViewChange('auth')}
+            style={{
+              padding: '4px 8px',
+              fontSize: '11.5px',
+              margin: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4
+            }}
+            title="Go back to Sign In / Role Selection"
+          >
+            <ArrowLeft size={12} />
+            <span>{t('switchUser')}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSignOut}
+            style={{
+              padding: '4px 10px',
+              fontSize: '11.5px',
+              margin: 0,
+              background: 'var(--brick-soft)',
+              color: 'var(--brick)',
+              border: '1px solid var(--brick-dim)',
+              borderRadius: 4,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontWeight: 600
+            }}
+            title={t('signOut')}
+          >
+            <LogOut size={12} />
+            <span>{t('signOut')}</span>
+          </button>
+        </div>
+      </div>
+
       {/* Intro Header */}
-      <div className="intro" style={{ padding: '4px 18px 0 18px' }}>
+      <div className="intro" style={{ padding: '14px 18px 0 18px' }}>
         <h1>{t('intakeHeading')}</h1>
         <p>{t('intakeSub')}</p>
       </div>

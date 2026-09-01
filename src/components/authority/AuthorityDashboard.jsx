@@ -14,7 +14,6 @@ import { MobileBottomNav } from './MobileBottomNav';
 import {
   Menu,
   Search,
-  Download,
   Globe,
   ChevronDown,
   LogOut,
@@ -50,13 +49,6 @@ export const AuthorityDashboard = ({ onViewChange }) => {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
-
-  const handleExportReport = () => {
-    showToast('Exporting SIH26-S02 Municipal Resolution Report (CSV/PDF)...', 'info');
-    setTimeout(() => {
-      showToast('Resolution Report downloaded successfully!', 'success');
-    }, 1000);
-  };
 
   const handleSignOut = () => {
     logout();
@@ -190,17 +182,6 @@ export const AuthorityDashboard = ({ onViewChange }) => {
               </div>
             )}
           </div>
-
-          <button
-            type="button"
-            className="btn-secondary no-print"
-            onClick={handleExportReport}
-            title="Download Municipal Resolution Report"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', fontSize: '12px' }}
-          >
-            <Download size={13} />
-            <span className="hidden-mobile">{t('exportReport')}</span>
-          </button>
 
           {/* User Profile Avatar with Sign Out dropdown */}
           <div style={{ position: 'relative' }}>

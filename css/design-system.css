@@ -1,0 +1,188 @@
+/* ==========================================================================
+   JanSetu AI Design System
+   Civic Design Language: Fraunces & IBM Plex Sans
+   ========================================================================== */
+
+:root {
+  /* Warm editorial civic palette */
+  --paper: #EEF0EA;
+  --card: #FBFBF7;
+  --card-hover: #F4F5F0;
+  --ink: #1B2320;
+  --ink-soft: #5B655F;
+  --ink-faint: #8B948D;
+  --line: #D9DDD2;
+  --line-strong: #C4C9BC;
+  
+  /* Accent hues */
+  --blue: #24425F;
+  --blue-dim: #3C5A78;
+  --blue-soft: #DEE6EC;
+  --blue-light: #EEF3F7;
+  
+  --brick: #A8402A;
+  --brick-dim: #8F3420;
+  --brick-soft: #F3E1DA;
+  
+  --ochre: #A97A22;
+  --ochre-dim: #8A611B;
+  --ochre-soft: #F1E7CE;
+  
+  --moss: #4C6E4F;
+  --moss-dim: #3A573D;
+  --moss-soft: #E1E9DF;
+
+  /* Elevation and radiuses */
+  --radius-sm: 4px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(27, 35, 32, 0.05);
+  --shadow-md: 0 4px 14px rgba(27, 35, 32, 0.08);
+  --shadow-lg: 0 10px 28px rgba(27, 35, 32, 0.12);
+  --shadow-fab: 0 4px 16px rgba(168, 64, 42, 0.38);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14.5px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-feature-settings: "liga", "kern";
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+/* Focus visibility for accessibility */
+:focus-visible {
+  outline: 2px solid var(--blue-dim);
+  outline-offset: 2px;
+}
+
+/* Utility Badges & Tags */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.badge-blue { background: var(--blue-soft); color: var(--blue-dim); }
+.badge-brick { background: var(--brick-soft); color: var(--brick); }
+.badge-ochre { background: var(--ochre-soft); color: var(--ochre-dim); }
+.badge-moss { background: var(--moss-soft); color: var(--moss); }
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) forwards;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-faint);
+}
+
+/* Toast Notifications Container */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  width: calc(100% - 32px);
+  max-width: 440px;
+}
+
+.toast {
+  pointer-events: auto;
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  animation: slideDown var(--transition-normal);
+}
+
+.toast.toast-success { border-left: 4px solid var(--moss); }
+.toast.toast-warning { border-left: 4px solid var(--ochre); }
+.toast.toast-info { border-left: 4px solid var(--blue-soft); }
+
+.toast-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}

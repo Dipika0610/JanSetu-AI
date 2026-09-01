@@ -1,0 +1,472 @@
+/* ==========================================================================
+   JanSetu Authentication & Registration Styles
+   Mobile-Friendly & Desktop-Optimized Civic Portal Auth Hub
+   ========================================================================== */
+
+body.auth-body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px 16px 60px 16px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* Header Picker Mode Switcher */
+.picker {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 0 20px 0;
+  width: 100%;
+}
+
+.picker-btn {
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-soft);
+  cursor: pointer;
+  background: var(--card);
+  font-weight: 500;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.picker-btn:hover {
+  border-color: var(--blue-dim);
+  color: var(--blue);
+}
+
+.picker-btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Stage Views */
+.stage {
+  display: none;
+  width: 100%;
+  animation: fadeIn var(--transition-normal);
+}
+
+.stage.active {
+  display: block;
+}
+
+/* Lockup Header */
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.lockup .mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(36, 66, 95, 0.25);
+}
+
+.lockup .name {
+  font-family: 'Fraunces', serif;
+  font-size: 17.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.lockup .sub {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.lede {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+}
+
+/* Auth Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 18px;
+}
+
+/* Form Fields */
+.field {
+  margin-bottom: 16px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.req {
+  color: var(--brick);
+}
+
+.optional-tag {
+  font-weight: 400;
+  color: var(--ink-faint);
+  font-size: 11.5px;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="password"],
+select {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13.8px;
+  color: var(--ink);
+  background: var(--paper);
+  transition: var(--transition-fast);
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--blue-dim);
+  outline-offset: -1px;
+  background: #fff;
+}
+
+.field-hint {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin-top: 5px;
+  line-height: 1.35;
+}
+
+/* Phone Input with Country Code */
+.phone-row {
+  display: flex;
+  gap: 8px;
+}
+
+.phone-row .cc {
+  width: 64px;
+  flex-shrink: 0;
+  text-align: center;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.phone-row input {
+  flex: 1;
+}
+
+/* 4-Digit OTP Boxes */
+.otp-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.otp-box {
+  width: 54px;
+  height: 54px;
+  text-align: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  font-size: 22px;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+  background: var(--paper);
+  color: var(--blue);
+  transition: all var(--transition-fast);
+}
+
+.otp-box:focus {
+  outline: 2px solid var(--blue-dim);
+  background: #fff;
+  border-color: var(--blue);
+}
+
+.otp-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.otp-meta .timer {
+  color: var(--ink-faint);
+}
+
+.otp-meta .resend {
+  color: var(--blue);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Language Chips Grid */
+.lang-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lang-chip {
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  background: var(--paper);
+  transition: var(--transition-fast);
+}
+
+.lang-chip.active {
+  background: var(--moss-soft);
+  border-color: var(--moss);
+  color: var(--moss);
+  font-weight: 600;
+}
+
+/* Role Options */
+.role-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.role-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 11px 12px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.role-option:hover {
+  background: var(--paper);
+}
+
+.role-option.active {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.role-option input {
+  margin-top: 3px;
+}
+
+.role-option .r-title {
+  font-weight: 600;
+  font-size: 13.3px;
+  color: var(--ink);
+}
+
+.role-option .r-desc {
+  font-size: 11.8px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+/* Admin Verification Alert */
+.admin-banner {
+  display: flex;
+  gap: 10px;
+  background: var(--ochre-soft);
+  border: 1px solid #E3CE9E;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  color: #6E4E15;
+  line-height: 1.4;
+}
+
+.admin-banner svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: #8A611B;
+  margin-top: 2px;
+}
+
+/* Progress Step Indicator */
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.progress i {
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line-strong);
+  transition: all var(--transition-fast);
+}
+
+.progress i.done {
+  background: var(--moss);
+}
+
+.progress i.current {
+  background: var(--blue);
+  width: 36px;
+}
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  padding: 12px 0;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background: var(--blue-dim);
+  box-shadow: 0 4px 12px rgba(36, 66, 95, 0.25);
+}
+
+.btn-ghost {
+  width: 100%;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+  padding: 11px 0;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 9px;
+  transition: var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  background: var(--card);
+  color: var(--ink);
+}
+
+/* Quick Demo Login Cards */
+.demo-accounts {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-top: 20px;
+}
+
+.demo-title {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-faint);
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.demo-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.demo-btn {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--blue);
+  text-align: center;
+  transition: var(--transition-fast);
+}
+
+.demo-btn:hover {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+}
+
+.foot-note {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  margin-top: 18px;
+}
+
+.foot-note a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.foot-note a:hover {
+  text-decoration: underline;
+}

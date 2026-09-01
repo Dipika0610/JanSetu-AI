@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JanSetu — Citizen Grievance Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/citizen.css">
+</head>
+<body class="citizen-body">
+
+<div class="shell">
+
+  <!-- ============ TOPBAR ============ -->
+  <header class="topbar">
+    <div class="brand-mark" title="JanSetu AI Civic Engine">G</div>
+    <div class="brand-text">
+      <div class="name">
+        <span>JanSetu</span>
+        <span class="badge badge-blue" style="font-size: 10px; padding: 1px 6px;">AI Enabled</span>
+      </div>
+      <div class="ward-row">
+        <select id="headerWardSelect" class="ward-select" title="Change your active ward">
+          <option value="Andheri West">Andheri West, Mumbai ▾</option>
+          <option value="Bandra West">Bandra West, Mumbai ▾</option>
+          <option value="Kurla">Kurla, Mumbai ▾</option>
+          <option value="Dadar">Dadar, Mumbai ▾</option>
+          <option value="Chembur">Chembur, Mumbai ▾</option>
+          <option value="Worli">Worli, Mumbai ▾</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <!-- User Profile / Auth Link -->
+      <a href="auth.html" class="lang-btn" id="citizenAuthBtn" title="Account / Switch User">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="citizenUserNameLabel">Karan M.</span>
+      </a>
+
+      <!-- Language Switcher -->
+      <button id="langToggleBtn" class="lang-btn" title="Switch Language">
+        <span id="currentLangLabel">EN</span>
+      </button>
+      
+      <!-- Link to Authority Dashboard -->
+      <a href="authority.html" class="portal-switch-btn" title="Open Municipal Authority Dashboard">
+        <span>Officer</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+
+      <!-- Notification Bell -->
+      <div class="bell" id="notifBell" title="Recent civic updates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+        </svg>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ TABS ============ -->
+  <nav class="tabs" role="tablist">
+    <div class="tab active" data-view="submit" role="tab" id="tab-submit">
+      <span>Report</span>
+    </div>
+    <div class="tab" data-view="mine" role="tab" id="tab-mine">
+      <span>My complaints</span>
+      <span class="tab-badge" id="myReportsCount">3</span>
+    </div>
+    <div class="tab" data-view="nearby" role="tab" id="tab-nearby">
+      <span>Nearby</span>
+    </div>
+  </nav>
+
+  <!-- ============ SUBMIT VIEW ============ -->
+  <main class="view active" id="submit" role="tabpanel">
+    <div class="intro">
+      <h1 id="lblIntakeHeading">What's the issue?</h1>
+      <p id="lblIntakeSub">Describe it in your own words — Hindi, Marathi, or English all work.</p>
+    </div>
+
+    <!-- Quick test prompts -->
+    <div class="quick-prompts" title="Click to test sample prompts">
+      <button class="prompt-chip" data-text="Gutter overflowing near the bus stop on Link Road, water has been standing for two days and smells very bad." data-loc="Near Link Road bus stop">💧 Link Rd Sewage</button>
+      <button class="prompt-chip" data-text="Bada khadda ho gaya hai road pe SV road junction, bike gir gayi accident ho sakta hai" data-loc="SV Road Junction, Bandra">🕳️ Bandra Pothole</button>
+      <button class="prompt-chip" data-text="रात्रीच्या वेळी शाळेच्या परिसरात सर्व पथदिवे बंद असतात. अंधार आहे." data-loc="Near BMC School No. 4, Chembur">💡 Marathi: पथदिवे बंद</button>
+      <button class="prompt-chip" data-text="Pipeline burst, clean drinking water is getting wasted on main road" data-loc="Pipeline Road, Kurla West">🚰 Kurla Water Leak</button>
+    </div>
+
+    <form id="grievanceForm" class="card" onsubmit="return false;">
+      <!-- Photo Dropzone -->
+      <span class="field-label">
+        <span>Photo (optional, helps AI verify faster)</span>
+        <span class="badge badge-moss" id="cvBadge" style="display:none;">AI Verified</span>
+      </span>
+      
+      <div class="photo-drop" id="photoDropArea">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="3" y="5" width="18" height="14" rx="2"/>
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M8 5l1.5-2h5L16 5"/>
+        </svg>
+        <div id="photoDropText">Tap to add a photo or drag image</div>
+        <input type="file" id="photoFileInput" accept="image/*">
+      </div>
+
+      <!-- Image Preview Box -->
+      <div class="photo-preview-box" id="photoPreviewBox">
+        <img id="photoPreviewImg" src="" alt="Grievance photo preview">
+        <div class="photo-preview-overlay">
+          <span id="photoPreviewTag">Detected: Visual evidence attached</span>
+          <button type="button" class="remove-photo-btn" id="removePhotoBtn">Remove</button>
+        </div>
+      </div>
+
+      <!-- Description Input & Voice Mic -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;">
+        <label for="complaintText" class="field-label" style="margin-bottom:0;">Description</label>
+        <span id="langIndicator" style="font-size: 11px; color: var(--ink-faint);">Multilingual AI Active</span>
+      </div>
+
+      <div class="textarea-wrapper">
+        <textarea id="complaintText" rows="4" placeholder="e.g. Sewage line ke paas paani jama ho gaya hai, bahot badbu aa rahi hai... / रस्त्यावरील दिवा बंद आहे..."></textarea>
+        <button type="button" class="voice-mic-btn" id="voiceMicBtn" title="Speak in Hindi/Marathi/English to dictate">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Real-time AI Category & Urgency Detection -->
+      <div class="detect-row" id="detectRow">
+        <span>Detected as</span>
+        <span class="detect-badge" id="deptBadge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          <span id="deptBadgeText">Sanitation</span>
+        </span>
+      </div>
+
+      <!-- Semantic Duplicate Alert Card -->
+      <div class="dup-alert" id="dupAlertBox">
+        <div class="dup-alert-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="9"/>
+            <line x1="12" y1="8" x2="12" y2="13"/>
+            <circle cx="12" cy="16" r="0.5" fill="currentColor"/>
+          </svg>
+          <span>Looks like this may already be reported</span>
+        </div>
+        <p id="dupAlertMsg">34 people nearby reported a similar sewage issue on Link Road in the last 3 days.</p>
+        <div class="dup-actions">
+          <button type="button" class="btn-small btn-join" id="btnJoinCluster">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Yes, same issue — add my report
+          </button>
+          <button type="button" class="btn-small btn-new" id="btnIgnoreDup">No, this is different</button>
+        </div>
+      </div>
+
+      <!-- Location Picker Row -->
+      <label class="field-label" style="margin-top: 14px;">Location</label>
+      <div class="location-row" id="locationRowBtn" title="Click to edit or calibrate location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/>
+          <circle cx="12" cy="10" r="2.4"/>
+        </svg>
+        <div style="flex:1;">
+          <div class="loc-text" id="locMainText">Near Link Road bus stop</div>
+          <div class="loc-sub" id="locSubText">Andheri West · using current GPS location</div>
+        </div>
+        <div class="change">Change</div>
+      </div>
+
+      <!-- Submit CTA Button -->
+      <button type="submit" class="submit-btn" id="submitGrievanceBtn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span>Submit report</span>
+      </button>
+    </form>
+  </main>
+
+  <!-- ============ MY COMPLAINTS VIEW ============ -->
+  <section class="view" id="mine" role="tabpanel">
+    <div class="intro">
+      <h1>Your reports</h1>
+      <p>Track live resolution status and duplicate clustering impact.</p>
+    </div>
+
+    <div id="myComplaintsList">
+      <!-- Injected dynamically via citizen.js -->
+    </div>
+  </section>
+
+  <!-- ============ NEARBY VIEW ============ -->
+  <section class="view" id="nearby" role="tabpanel">
+    <div class="intro">
+      <h1>Happening near you</h1>
+      <p>Issues reported by others within 1 km of Andheri West.</p>
+    </div>
+
+    <div class="nearby-filter-bar">
+      <span style="font-size: 12px; color: var(--ink-soft); font-weight: 500;">Radius:</span>
+      <select class="distance-select" id="nearbyRadiusFilter">
+        <option value="500">Within 500m</option>
+        <option value="1000" selected>Within 1 km</option>
+        <option value="3000">Within 3 km</option>
+      </select>
+    </div>
+
+    <!-- Mini GIS Map -->
+    <div class="nearby-map-container">
+      <svg viewBox="0 0 424 170" width="100%" height="auto" style="display:block;background:#E4E7DD;" id="nearbySvgMap">
+        <!-- Road Grid Background -->
+        <line x1="0" y1="40" x2="424" y2="30" stroke="#C4C9BC" stroke-width="1.2"/>
+        <line x1="0" y1="95" x2="424" y2="105" stroke="#C4C9BC" stroke-width="1.2"/>
+        <line x1="140" y1="0" x2="150" y2="170" stroke="#C4C9BC" stroke-width="1.2"/>
+        <line x1="290" y1="0" x2="280" y2="170" stroke="#C4C9BC" stroke-width="1.2"/>
+
+        <!-- Hotspot Pin 1 (High: Sewage Link Rd) -->
+        <circle cx="90" cy="55" r="15" fill="#A8402A" fill-opacity="0.25"/>
+        <circle cx="90" cy="55" r="6.5" fill="#A8402A"/>
+        
+        <!-- Hotspot Pin 2 (Med: Streetlight) -->
+        <circle cx="210" cy="70" r="10" fill="#A97A22" fill-opacity="0.3"/>
+        <circle cx="210" cy="70" r="5" fill="#A97A22"/>
+        
+        <!-- Hotspot Pin 3 (Low: Zebra / Pothole) -->
+        <circle cx="320" cy="50" r="8" fill="#4C6E4F" fill-opacity="0.3"/>
+        <circle cx="320" cy="50" r="4" fill="#4C6E4F"/>
+
+        <!-- Hotspot Pin 4 (Water) -->
+        <circle cx="175" cy="120" r="7" fill="#24425F" fill-opacity="0.3"/>
+        <circle cx="175" cy="120" r="3.5" fill="#24425F"/>
+
+        <!-- Citizen Location Indicator -->
+        <circle cx="205" cy="88" r="5" fill="#24425F" stroke="#fff" stroke-width="2"/>
+        <text x="205" y="106" text-anchor="middle" font-family="IBM Plex Sans" font-size="9.5" fill="#24425F" font-weight="600">You are here</text>
+      </svg>
+    </div>
+
+    <!-- Nearby Incident Cards List -->
+    <div id="nearbyIncidentList">
+      <!-- Injected dynamically via citizen.js -->
+    </div>
+  </section>
+
+  <!-- ============ FLOATING ACTION BUTTON ============ -->
+  <div class="fab" id="fabNewReport" title="Report a new civic issue">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </div>
+
+</div>
+
+<!-- Location Calibration Modal -->
+<div class="modal-backdrop" id="locationModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size:16px;">Select Location & Ward</h3>
+      <button type="button" class="btn-secondary" id="closeLocModal" style="padding:2px 8px;">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label">Ward</label>
+      <select id="modalWardSelect" class="select-ctrl" style="width:100%;margin-bottom:14px;">
+        <option value="Andheri West">Andheri West</option>
+        <option value="Bandra West">Bandra West</option>
+        <option value="Kurla">Kurla</option>
+        <option value="Dadar">Dadar</option>
+        <option value="Chembur">Chembur</option>
+        <option value="Worli">Worli</option>
+      </select>
+
+      <label class="field-label">Specific Landmark / Street</label>
+      <input type="text" id="modalLandmarkInput" class="select-ctrl" style="width:100%;" value="Near Link Road bus stop">
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" id="cancelLocModal">Cancel</button>
+      <button type="button" class="btn-primary" id="saveLocModal">Confirm Location</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Feedback Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="js/mockData.js"></script>
+<script src="js/aiEngine.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/citizen.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>JanSetu — Authentication & Registration Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+
+<div class="auth-container">
+
+  <!-- ============ ROLE PICKER ============ -->
+  <div class="picker">
+    <button type="button" class="picker-btn active" data-target="citizenStage" id="btnPickerCitizen">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Citizen Access</span>
+    </button>
+    <button type="button" class="picker-btn" data-target="staffStage" id="btnPickerStaff">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Municipal Staff</span>
+    </button>
+  </div>
+
+  <!-- ==========================================================================
+       CITIZEN FLOW
+       ========================================================================== -->
+  <div class="stage active" id="citizenStage">
+    
+    <!-- Lockup Header -->
+    <div class="lockup">
+      <div class="mark">G</div>
+      <div>
+        <div class="name">JanSetu Citizen Portal</div>
+        <div class="sub">Municipal Corporation · Mumbai</div>
+      </div>
+    </div>
+
+    <!-- ============ Citizen Step 1: Name & Phone ============ -->
+    <div id="citizen-step-1">
+      <div class="progress"><i class="current"></i><i></i><i></i></div>
+      <h1>Let's get you registered</h1>
+      <p class="lede">Just your phone number to start — you'll verify it with a one-time code.</p>
+
+      <form id="citizenPhoneForm" class="card" onsubmit="return false;">
+        <div class="field">
+          <label for="citizenFullName">Full name <span class="req">*</span></label>
+          <input type="text" id="citizenFullName" placeholder="e.g. Karan Malhotra" required value="Karan Malhotra">
+        </div>
+
+        <div class="field">
+          <label for="citizenPhone">Mobile number <span class="req">*</span></label>
+          <div class="phone-row">
+            <input type="text" class="cc" value="+91" readonly>
+            <input type="tel" id="citizenPhone" placeholder="98765 43210" required value="98201 44520">
+          </div>
+          <div class="field-hint">Used to sign in and send live status updates via SMS.</div>
+        </div>
+
+        <button type="button" class="btn-primary" id="btnSendOtp">
+          <span>Send verification code</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
+      <!-- Quick Demo 1-Click Login -->
+      <div class="demo-accounts">
+        <div class="demo-title">⚡ 1-Click Quick Demo Login</div>
+        <div class="demo-btn-group">
+          <button type="button" class="demo-btn" id="demoCitizenBtn">Log in as Karan M. (Citizen)</button>
+        </div>
+      </div>
+
+      <div class="foot-note">
+        Already registered? <a href="#" id="toggleCitizenLoginMode">Direct login</a>
+      </div>
+    </div>
+
+    <!-- ============ Citizen Step 2: 4-Digit OTP ============ -->
+    <div id="citizen-step-2" style="display:none;">
+      <div class="progress"><i class="done"></i><i class="current"></i><i></i></div>
+      <h1>Enter the code</h1>
+      <p class="lede">We've sent a 4-digit code by SMS to <strong id="otpTargetPhone">+91 98201 44520</strong>.</p>
+
+      <form id="citizenOtpForm" class="card" onsubmit="return false;">
+        <div class="field">
+          <label>Verification code (Hint: enter any 4 digits or 1234)</label>
+          <div class="otp-row">
+            <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric" autofocus>
+            <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric">
+            <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric">
+            <input type="text" class="otp-box" maxlength="1" pattern="[0-9]" inputmode="numeric">
+          </div>
+          <div class="otp-meta">
+            <span class="timer" id="otpTimer">Code expires in 04:12</span>
+            <span class="resend" id="btnResendOtp">Resend code</span>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" id="btnVerifyOtp" style="margin-top: 18px;">
+          <span>Verify &amp; continue</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button type="button" class="btn-ghost" id="btnBackToStep1">Change number</button>
+      </form>
+    </div>
+
+    <!-- ============ Citizen Step 3: Ward & Language ============ -->
+    <div id="citizen-step-3" style="display:none;">
+      <div class="progress"><i class="done"></i><i class="done"></i><i class="current"></i></div>
+      <h1>Almost done</h1>
+      <p class="lede">This helps us route your complaints to the right ward office, in your preferred language.</p>
+
+      <form id="citizenFinalForm" class="card" onsubmit="return false;">
+        <div class="field">
+          <label for="citizenWardSelect">Your home ward <span class="req">*</span></label>
+          <select id="citizenWardSelect">
+            <option value="Andheri West" selected>Andheri West (Auto-detected via GPS)</option>
+            <option value="Bandra West">Bandra West</option>
+            <option value="Kurla">Kurla</option>
+            <option value="Dadar">Dadar</option>
+            <option value="Chembur">Chembur</option>
+            <option value="Worli">Worli</option>
+          </select>
+          <div class="field-hint">You can change this any time in your profile.</div>
+        </div>
+
+        <div class="field">
+          <label>Preferred language <span class="req">*</span></label>
+          <div class="lang-grid" id="authLangGrid">
+            <div class="lang-chip active" data-lang="English">English</div>
+            <div class="lang-chip" data-lang="Hindi">हिंदी</div>
+            <div class="lang-chip" data-lang="Marathi">मराठी</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="citizenEmail">Email <span class="optional-tag">(optional, for digital receipts)</span></label>
+          <input type="email" id="citizenEmail" placeholder="you@example.com">
+        </div>
+
+        <button type="button" class="btn-primary" id="btnCompleteRegistration">
+          <span>Create account &amp; enter portal</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================================
+       STAFF / MUNICIPAL AUTHORITY FLOW
+       ========================================================================== -->
+  <div class="stage" id="staffStage">
+    
+    <div class="lockup">
+      <div class="mark">G</div>
+      <div>
+        <div class="name">JanSetu Command Center</div>
+        <div class="sub">Staff &amp; Officer Management</div>
+      </div>
+    </div>
+
+    <!-- Mode Selector: Sign In vs Admin Provision -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;">
+      <button type="button" class="btn-ghost" id="tabStaffLogin" style="flex:1;margin-top:0;font-weight:600;background:var(--card);border-color:var(--blue);color:var(--blue);">Officer Sign In</button>
+      <button type="button" class="btn-ghost" id="tabStaffRegister" style="flex:1;margin-top:0;background:var(--paper);">Staff Provisioning</button>
+    </div>
+
+    <!-- ============ Staff Login View ============ -->
+    <div id="staffLoginView">
+      <h1>Officer sign in</h1>
+      <p class="lede">Sign in with your official municipal credentials to access the priority dispatch queue.</p>
+
+      <form id="staffLoginForm" class="card" onsubmit="return false;">
+        <div class="field">
+          <label for="staffLoginEmail">Official email or Employee ID <span class="req">*</span></label>
+          <input type="text" id="staffLoginEmail" placeholder="e.g. s.kulkarni@municipalcorp.gov.in" value="s.kulkarni@municipalcorp.gov.in">
+        </div>
+
+        <div class="field">
+          <label for="staffLoginPassword">Password <span class="req">*</span></label>
+          <input type="password" id="staffLoginPassword" placeholder="••••••••" value="officer2026">
+        </div>
+
+        <button type="button" class="btn-primary" id="btnStaffLoginSubmit">
+          <span>Sign In to Dashboard</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
+      <!-- 1-Click Demo Officer Logins -->
+      <div class="demo-accounts">
+        <div class="demo-title">⚡ 1-Click Demo Officer Logins</div>
+        <div class="demo-btn-group" style="flex-direction:column;gap:6px;">
+          <button type="button" class="demo-btn" id="demoOfficerKulkarni">Login as S. Kulkarni (Ward Officer · Andheri W)</button>
+          <button type="button" class="demo-btn" id="demoOfficerPatil">Login as JE Nilesh Patil (Sanitation · Andheri W)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ Staff Provisioning View ============ -->
+    <div id="staffRegisterView" style="display:none;">
+      <h1>Provision staff account</h1>
+      <p class="lede">Staff accounts are authorized by a ward administrator.</p>
+
+      <div class="admin-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/>
+        </svg>
+        <span>You're creating this account as an administrator. The employee will receive login credentials at their official email.</span>
+      </div>
+
+      <form id="staffRegisterForm" class="card" onsubmit="return false;">
+        <div class="field">
+          <label for="staffRegName">Full name <span class="req">*</span></label>
+          <input type="text" id="staffRegName" placeholder="Employee's full name" required value="Anand Deshmukh">
+        </div>
+
+        <div class="field">
+          <label for="staffRegDesignation">Designation</label>
+          <input type="text" id="staffRegDesignation" placeholder="e.g. Ward Officer, Field Inspector" value="Executive Engineer">
+        </div>
+
+        <div class="field">
+          <label for="staffRegEmpId">Employee ID <span class="req">*</span></label>
+          <input type="text" id="staffRegEmpId" placeholder="e.g. MCGM-ENG-9102" required value="MCGM-ENG-9102">
+        </div>
+
+        <div class="field">
+          <label for="staffRegEmail">Official email <span class="req">*</span></label>
+          <input type="email" id="staffRegEmail" placeholder="name@municipalcorp.gov.in" required value="a.deshmukh@municipalcorp.gov.in">
+          <div class="field-hint">Must be a verified government domain address.</div>
+        </div>
+
+        <div class="field">
+          <label for="staffRegDept">Department <span class="req">*</span></label>
+          <select id="staffRegDept">
+            <option value="sanitation">Sanitation &amp; Waste</option>
+            <option value="water">Water Supply</option>
+            <option value="roads">Roads &amp; Traffic</option>
+            <option value="electricity">Electricity</option>
+            <option value="public-works">Public Works &amp; Safety</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="staffRegWard">Ward(s) of jurisdiction <span class="req">*</span></label>
+          <select id="staffRegWard">
+            <option value="Andheri West">Andheri West</option>
+            <option value="Bandra West">Bandra West</option>
+            <option value="Kurla">Kurla</option>
+            <option value="Dadar">Dadar</option>
+            <option value="Chembur">Chembur</option>
+            <option value="Worli">Worli</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Access level <span class="req">*</span></label>
+          <div class="role-options">
+            <label class="role-option active">
+              <input type="radio" name="accessRole" value="Field officer" checked>
+              <div>
+                <div class="r-title">Field officer</div>
+                <div class="r-desc">Views assigned complaints and updates their status.</div>
+              </div>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="accessRole" value="Ward supervisor">
+              <div>
+                <div class="r-title">Ward supervisor</div>
+                <div class="r-desc">Can reassign complaints, confirm duplicate merges, view analytics.</div>
+              </div>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="accessRole" value="Admin">
+              <div>
+                <div class="r-title">Admin</div>
+                <div class="r-desc">Full access across wards, including staff provisioning.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" id="btnCreateStaffAccount">
+          <span>Create staff account</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="foot-note">The employee sets their own password on first login.</div>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="js/mockData.js"></script>
+<script src="js/aiEngine.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

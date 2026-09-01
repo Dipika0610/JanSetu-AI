@@ -186,9 +186,40 @@ export const GrievanceProvider = ({ children }) => {
   };
 
   /**
+   * Add interactive comment/reply to complaint thread
+   */
+  const addComment = (complaintId, authorName, role, messageText) => {
+    if (!messageText || !messageText.trim()) return;
+
+    const newComment = {
+      id: `c_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      author: authorName || (role === 'Citizen' ? (currentUser?.name || 'Citizen') : 'Municipal Officer'),
+      role: role || 'Citizen',
+      text: messageText.trim(),
+      timestamp: new Date().toISOString()
+    };
+
+    setComplaints(prev => {
+      return prev.map(item => {
+        if (item.id === complaintId) {
+          const existing = item.comments || [];
+          return {
+            ...item,
+            comments: [...existing, newComment]
+          };
+        }
+        return item;
+      });
+    });
+
+    showToast(`Reply posted to report #${complaintId}`, 'info');
+    return newComment;
+  };
+
+  /**
    * Rate resolution
    */
-  const rateResolution = (id, rating, feedback) => {
+  const rateResolution = (id, rating, feedback, tags = []) => {
     setComplaints(prev => {
       return prev.map(item => {
         if (item.id === id) {
@@ -196,6 +227,7 @@ export const GrievanceProvider = ({ children }) => {
             ...item,
             rating,
             feedback,
+            feedbackTags: tags,
             status: 'closed'
           };
         }
@@ -246,7 +278,8 @@ export const GrievanceProvider = ({ children }) => {
         updateComplaintStatus,
         mergeCluster,
         rateResolution,
-        reopenComplaint
+        reopenComplaint,
+        addComment
       }}
     >
       {children}

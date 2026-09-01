@@ -179,7 +179,26 @@ export const TRANSLATIONS = {
     departmentLabel: "Department",
     jurisdictionWard: "Ward of jurisdiction",
     accessLevel: "Access level",
-    createStaffBtn: "Create staff account"
+    createStaffBtn: "Create staff account",
+
+    // Resolution Completion & Feedback & Discussion Thread
+    completionAlertTitle: "🎉 Grievance Marked Resolved!",
+    completionAlertDesc: "The municipal authority has resolved this issue. Please inspect and submit your feedback rating.",
+    rateResolutionTitle: "Rate Resolution Quality",
+    feedbackSubmittedTitle: "Feedback Submitted",
+    feedbackSubmittedDesc: "Thank you! Your feedback helps us improve municipal services.",
+    feedbackCommentPlaceholder: "Share optional comments about the work done...",
+    submitFeedbackBtn: "Submit Rating & Close Ticket",
+    discussionThreadTitle: "Discussion & Updates Thread",
+    typeReplyPlaceholder: "Type a reply or question for the ward officer...",
+    sendReplyBtn: "Send Reply",
+    tagPromptAction: "⚡ Quick Action",
+    tagGoodQuality: "👍 Quality Work",
+    tagPoliteOfficer: "😊 Courteous Staff",
+    tagNeedsFollowup: "⚠️ Needs Follow-up",
+    badgeCitizen: "Citizen",
+    badgeOfficer: "Municipal Officer",
+    noCommentsYet: "No messages yet. Start a conversation with the ward officer below."
   },
   
   hi: {
@@ -357,7 +376,26 @@ export const TRANSLATIONS = {
     departmentLabel: "विभाग",
     jurisdictionWard: "अधिकार क्षेत्र वार्ड",
     accessLevel: "पहुँच स्तर",
-    createStaffBtn: "कर्मचारी खाता बनाएं"
+    createStaffBtn: "कर्मचारी खाता बनाएं",
+
+    // Resolution Completion & Feedback & Discussion Thread
+    completionAlertTitle: "🎉 शिकायत का समाधान कर दिया गया है!",
+    completionAlertDesc: "नगर निगम द्वारा इस समस्या को हल कर दिया गया है। कृपया कार्य की समीक्षा करें और अपनी प्रतिक्रिया दें।",
+    rateResolutionTitle: "समाधान की गुणवत्ता को रेट करें",
+    feedbackSubmittedTitle: "प्रतिक्रिया प्राप्त हुई",
+    feedbackSubmittedDesc: "धन्यवाद! आपकी प्रतिक्रिया नागरिक सेवाओं में सुधार करने में मदद करती है।",
+    feedbackCommentPlaceholder: "किए गए कार्य के बारे में अतिरिक्त टिप्पणी लिखें...",
+    submitFeedbackBtn: "रेटिंग जमा करें और टिकट बंद करें",
+    discussionThreadTitle: "चर्चा और अद्यतन थ्रेड",
+    typeReplyPlaceholder: "वार्ड अधिकारी के लिए उत्तर या प्रश्न लिखें...",
+    sendReplyBtn: "उत्तर भेजें",
+    tagPromptAction: "⚡ त्वरित कार्रवाई",
+    tagGoodQuality: "👍 गुणवत्तापूर्ण कार्य",
+    tagPoliteOfficer: "😊 विनम्र अधिकारी",
+    tagNeedsFollowup: "⚠️ अनुवर्ती की आवश्यकता",
+    badgeCitizen: "नागरिक",
+    badgeOfficer: "नगर निगम अधिकारी",
+    noCommentsYet: "अभी तक कोई संदेश नहीं है। नीचे अधिकारी के साथ बातचीत शुरू करें।"
   },
   
   mr: {
@@ -535,6 +573,25 @@ export const TRANSLATIONS = {
     departmentLabel: "विभाग",
     jurisdictionWard: "अधिकार क्षेत्र प्रभाग",
     accessLevel: "प्रवेश स्तर",
-    createStaffBtn: "कर्मचारी खाते तयार करा"
+    createStaffBtn: "कर्मचारी खाते तयार करा",
+
+    // Resolution Completion & Feedback & Discussion Thread
+    completionAlertTitle: "🎉 तक्रारीचे निवारण पूर्ण झाले आहे!",
+    completionAlertDesc: "महानगरपालिकेने ही समस्या सोडवली आहे. कृपया कामाची पाहणी करा आणि तुमचा अभिप्रायाचा अभिप्राय द्या.",
+    rateResolutionTitle: "निवारण गुणवत्तेचे मूल्यांकन करा",
+    feedbackSubmittedTitle: "अभिप्राय प्राप्त झाला",
+    feedbackSubmittedDesc: "धन्यवाद! तुमचा अभिप्राय मनपा सेवा सुधारण्यास मदत करतो.",
+    feedbackCommentPlaceholder: "केलेल्या कामाबद्दल अतिरिक्त टिप्पणी लिहा...",
+    submitFeedbackBtn: "रेटिंग सबमिट करा आणि तिकीट बंद करा",
+    discussionThreadTitle: "चर्चा व अपडेट्स थ्रेड",
+    typeReplyPlaceholder: "प्रभाग अधिकाऱ्याला उत्तर किंवा प्रश्न पाठवा...",
+    sendReplyBtn: "उत्तर पाठवा",
+    tagPromptAction: "⚡ जलद कारवाई",
+    tagGoodQuality: "👍 उत्तम काम",
+    tagPoliteOfficer: "😊 नम्र अधिकारी",
+    tagNeedsFollowup: "⚠️ पाठपुरावा आवश्यक",
+    badgeCitizen: "नागरिक",
+    badgeOfficer: "मनपा अधिकारी",
+    noCommentsYet: "अजून कोणतेही संदेश नाहीत. खाली प्रभाग अधिकाऱ्यासोबत संवाद सुरू करा."
   }
 };

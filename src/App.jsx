@@ -8,7 +8,7 @@ import { AuthHub } from './components/auth/AuthHub';
 
 export function App() {
   const { currentUser } = useAuth();
-  const [activeView, setActiveView] = useState('citizen'); // 'citizen' | 'authority' | 'auth'
+  const [activeView, setActiveView] = useState('auth'); // 'auth' | 'citizen' | 'authority'
 
   return (
     <div className="jansetu-app">

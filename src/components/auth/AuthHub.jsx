@@ -3,7 +3,7 @@ import { useAuth, DEFAULT_CITIZEN, DEFAULT_OFFICER } from '../../context/AuthCon
 import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { WARDS } from '../../data/mockData';
-import { User, Shield, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export const AuthHub = ({ onAuthenticated, onBack }) => {
   const { loginCitizen, loginStaff } = useAuth();
@@ -96,29 +96,7 @@ export const AuthHub = ({ onAuthenticated, onBack }) => {
 
   return (
     <div className="auth-container animate-fade-in" style={{ padding: '16px 0' }}>
-      {/* Top Back Navigation Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <button
-          type="button"
-          className="btn-ghost"
-          onClick={() => onBack ? onBack() : onAuthenticated('citizen')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '5px 10px', fontSize: '12px', margin: 0 }}
-          title="Return to Citizen Portal"
-        >
-          <ArrowLeft size={13} />
-          <span>← Back to Portal</span>
-        </button>
-        <button
-          type="button"
-          className="btn-ghost"
-          onClick={() => onAuthenticated('authority')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '5px 10px', fontSize: '12px', margin: 0 }}
-          title="Go to Officer Dashboard"
-        >
-          <span>Officer Dashboard</span>
-          <ArrowRight size={13} />
-        </button>
-      </div>
+
 
       {/* Role Picker */}
       <div className="picker">

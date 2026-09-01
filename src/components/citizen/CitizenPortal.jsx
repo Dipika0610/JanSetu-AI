@@ -6,7 +6,7 @@ import { GrievanceForm } from './GrievanceForm';
 import { MyComplaints } from './MyComplaints';
 import { NearbyFeed } from './NearbyFeed';
 import { DemoScenarios } from './DemoScenarios';
-import { Plus, Sparkles, User, LogOut, ArrowLeft } from 'lucide-react';
+import { Plus, Sparkles, User, LogOut, ArrowLeft, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export const CitizenPortal = ({ onViewChange }) => {
   const { currentUser, logout } = useAuth();
@@ -14,7 +14,10 @@ export const CitizenPortal = ({ onViewChange }) => {
   const { lang, t } = useLanguage();
   const [activeTab, setActiveTab] = useState('submit');
 
-  const myCount = complaints.filter(c => c.similarCount > 0 || c.id.startsWith('GRV-2026-0001')).length;
+  const myCount = complaints.filter(c => c.similarCount > 0 || c.id.startsWith('GRV-2026-0001') || c.authorName === currentUser?.name).length;
+  
+  // Find resolved complaints requiring citizen rating
+  const resolvedCount = complaints.filter(c => c.status === 'resolved' && (c.authorName === currentUser?.name || c.id.startsWith('GRV-2026-0001'))).length;
 
   const handleSignOut = () => {
     logout();
@@ -113,6 +116,32 @@ export const CitizenPortal = ({ onViewChange }) => {
         <h1>{t('intakeHeading')}</h1>
         <p>{t('intakeSub')}</p>
       </div>
+
+      {/* Completion Alert Bar on Portal if any complaint is marked resolved */}
+      {resolvedCount > 0 && activeTab !== 'mine' && (
+        <div
+          onClick={() => setActiveTab('mine')}
+          className="animate-fade-in"
+          style={{
+            margin: '12px 18px 4px 18px',
+            padding: '10px 14px',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            color: '#fff',
+            borderRadius: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '12.5px', fontWeight: 600 }}>
+            <CheckCircle2 size={18} />
+            <span>🎉 {resolvedCount} {resolvedCount === 1 ? 'report has been resolved' : 'reports have been resolved'}! Tap to review &amp; rate resolution.</span>
+          </div>
+          <ChevronRight size={16} />
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <nav className="tabs" role="tablist">

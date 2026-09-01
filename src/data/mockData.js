@@ -72,7 +72,23 @@ export const INITIAL_COMPLAINTS = [
     ],
     photo: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=80',
     upvotes: 34,
-    authorName: 'Karan Malhotra'
+    authorName: 'Karan Malhotra',
+    comments: [
+      {
+        id: 'c1',
+        author: 'Karan Malhotra',
+        role: 'Citizen',
+        text: 'Water has started entering local shops near the bus stop. Please dispatch team soon.',
+        timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString()
+      },
+      {
+        id: 'c2',
+        author: 'JE Nilesh Patil',
+        role: 'Municipal Officer',
+        text: 'Suction tanker vehicle #MH-02-CB-4910 dispatched. Suction & line clearing in progress.',
+        timestamp: new Date(Date.now() - 1 * 3600 * 1000).toISOString()
+      }
+    ]
   },
   {
     id: 'GRV-2026-000224',
@@ -286,7 +302,16 @@ export const INITIAL_COMPLAINTS = [
     recommended_action: ['Clear bin and verify GPS log of garbage compactor vehicle.'],
     photo: null,
     upvotes: 1,
-    authorName: 'Rahul Verma'
+    authorName: 'Rahul Verma',
+    comments: [
+      {
+        id: 'c10',
+        author: 'JE Nilesh Patil',
+        role: 'Municipal Officer',
+        text: 'Garbage compactor vehicle cleared the Ranade Road bins at 11:30 AM. Photo proof uploaded.',
+        timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString()
+      }
+    ]
   }
 ];
 

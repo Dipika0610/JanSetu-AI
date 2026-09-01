@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
+import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { OFFICERS } from '../../data/mockData';
 import { evaluateVolumePriorityCondition } from '../../services/aiEngine';
-import { Sparkles, X, ArrowRight, Flame, Users, Clock, CheckCircle2, ShieldAlert } from 'lucide-react';
+import {
+  Sparkles, X, ArrowRight, Flame, Users, Clock, CheckCircle2,
+  ShieldAlert, MessageSquare, Send, User, Shield
+} from 'lucide-react';
 
 export const ActionDrawer = ({ complaint, onClose }) => {
-  const { updateComplaintStatus } = useGrievances();
+  const { updateComplaintStatus, addComment } = useGrievances();
+  const { currentUser } = useAuth();
   const { t } = useLanguage();
 
   const [assignedOfficer, setAssignedOfficer] = useState(complaint?.assignedTo || '');
   const [status, setStatus] = useState(complaint?.status || 'assigned');
   const [actionNotes, setActionNotes] = useState(complaint?.notes || '');
+  const [officerReplyText, setOfficerReplyText] = useState('');
 
   if (!complaint) return null;
 
+  const commentsList = complaint.comments || [];
   const count = (complaint.similarCount || 0) > 0 ? complaint.similarCount : (complaint.upvotes || 1);
   const volumeRule = evaluateVolumePriorityCondition(count);
 
@@ -41,9 +48,16 @@ export const ActionDrawer = ({ complaint, onClose }) => {
     onClose();
   };
 
+  const handleSendOfficerReply = () => {
+    if (!officerReplyText || !officerReplyText.trim()) return;
+    const officerName = currentUser?.name || assignedOfficer || 'Municipal Officer';
+    addComment(complaint.id, officerName, 'Municipal Officer', officerReplyText);
+    setOfficerReplyText('');
+  };
+
   return (
     <div className="modal-backdrop open">
-      <div className="modal-card">
+      <div className="modal-card" style={{ maxWidth: '640px' }}>
         <div className="modal-header">
           <div>
             <h3 style={{ fontSize: '16px', fontWeight: 600 }}>{t('grievanceDetails')}</h3>
@@ -56,7 +70,7 @@ export const ActionDrawer = ({ complaint, onClose }) => {
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="modal-body" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
           {/* Volume Decision Engine Breakdown Callout */}
           <div
             style={{
@@ -156,17 +170,132 @@ export const ActionDrawer = ({ complaint, onClose }) => {
             </div>
           </div>
 
-          {/* Explainable AI Details */}
-          {complaint.explanation && (
-            <div style={{ background: 'var(--paper)', borderRadius: 6, padding: '10px 12px', marginBottom: 14, fontSize: '11.8px' }}>
-              <strong style={{ color: 'var(--blue)' }}>{t('explainableAiRationale')}</strong>
-              <ul style={{ paddingLeft: 16, marginTop: 4, color: 'var(--ink-soft)' }}>
-                {complaint.explanation.map((e, idx) => (
-                  <li key={idx}>{e}</li>
-                ))}
-              </ul>
+          {/* Citizen Feedback / Rating Display if closed */}
+          {complaint.rating > 0 && (
+            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 6, padding: '10px 12px', marginBottom: 14, fontSize: '12px' }}>
+              <div style={{ fontWeight: 600, color: 'var(--ochre)', marginBottom: 4 }}>
+                Citizen Feedback Rating: {complaint.rating} ★
+              </div>
+              <div style={{ color: 'var(--ink-soft)' }}>"{complaint.feedback || 'Resolution verified'}"</div>
+              {complaint.feedbackTags && complaint.feedbackTags.length > 0 && (
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
+                  {complaint.feedbackTags.map((tag, idx) => (
+                    <span key={idx} style={{ background: 'var(--blue-soft)', color: 'var(--blue)', fontSize: '10.5px', padding: '2px 6px', borderRadius: 4, fontWeight: 600 }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
+
+          {/* ================= 2-WAY CITIZEN-OFFICER DISCUSSION THREAD ================= */}
+          <div style={{ borderTop: '1px dashed var(--line)', paddingTop: 12, marginTop: 12, marginBottom: 14 }}>
+            <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--ink)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <MessageSquare size={14} style={{ color: 'var(--blue)' }} />
+              <span>{t('discussionThreadTitle')} ({commentsList.length})</span>
+            </div>
+
+            {/* Comments List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10, maxHeight: 180, overflowY: 'auto', background: 'var(--paper)', padding: '8px', borderRadius: 6, border: '1px solid var(--line)' }}>
+              {commentsList.length === 0 ? (
+                <div style={{ fontStyle: 'italic', color: 'var(--ink-faint)', fontSize: '11.5px' }}>
+                  {t('noCommentsYet')}
+                </div>
+              ) : (
+                commentsList.map(comment => {
+                  const isOfficer = comment.role !== 'Citizen';
+                  return (
+                    <div
+                      key={comment.id}
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                        alignItems: 'flex-start',
+                        background: isOfficer ? 'var(--blue-soft)' : 'var(--card)',
+                        padding: '6px 10px',
+                        borderRadius: 6,
+                        border: isOfficer ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid var(--line)'
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          background: isOfficer ? 'var(--blue)' : 'var(--ink-soft)',
+                          color: '#fff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          flexShrink: 0
+                        }}
+                      >
+                        {isOfficer ? <Shield size={11} /> : <User size={11} />}
+                      </div>
+                      <div style={{ flex: 1, fontSize: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 600, color: isOfficer ? 'var(--blue)' : 'var(--ink)' }}>
+                            {comment.author}
+                          </span>
+                          <span style={{ fontSize: '9.5px', color: 'var(--ink-faint)' }}>
+                            {comment.timestamp ? new Date(comment.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                          </span>
+                        </div>
+                        <div style={{ color: 'var(--ink)', marginTop: 2, lineHeight: 1.35 }}>
+                          {comment.text}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Officer Reply Input */}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input
+                type="text"
+                placeholder="Type an official reply or status update for citizen..."
+                value={officerReplyText}
+                onChange={(e) => setOfficerReplyText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSendOfficerReply();
+                }}
+                style={{
+                  flex: 1,
+                  padding: '6px 10px',
+                  fontSize: '12px',
+                  borderRadius: 6,
+                  border: '1px solid var(--line)',
+                  background: 'var(--card)',
+                  color: 'var(--ink)'
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleSendOfficerReply}
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  background: 'var(--blue)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontWeight: 600
+                }}
+              >
+                <Send size={12} />
+                <span>Reply</span>
+              </button>
+            </div>
+          </div>
 
           {/* Action Form */}
           <div style={{ borderTop: '1px dashed var(--line)', paddingTop: 14, marginTop: 8 }}>

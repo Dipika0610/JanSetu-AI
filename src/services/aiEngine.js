@@ -3,7 +3,7 @@
  * Full implementation of SIH26-S02 AI Analysis Layer:
  * 1. Multilingual Normalization (Hindi, Hinglish, Marathi, English)
  * 2. Supervised Category Classification & Department Routing
- * 3. Explainable Priority Scoring (Rule + Math Equation)
+ * 3. Explainable Priority Scoring (Rule + Math Equation + Volume Multipliers)
  * 4. Hybrid Duplicate Detection (Semantic + Haversine Geo + Time)
  */
 
@@ -66,6 +66,69 @@ const SENSITIVE_ZONES = [
   { keyword: 'शाळा', name: 'School Zone', weight: 20 },
   { keyword: 'रुग्णालय', name: 'Hospital Zone', weight: 20 }
 ];
+
+/**
+ * Evaluates explicit conditional statements for prioritizing complaints
+ * based on the number of complaints submitted (Cluster / Duplicate Volume N)
+ */
+export function evaluateVolumePriorityCondition(count = 1) {
+  if (count >= 25) {
+    return {
+      conditionMet: 'MASS_OUTBREAK',
+      minPriority: 'Critical',
+      scoreBoost: 35,
+      slaHours: 2,
+      badgeLabel: `🚨 Mass Outbreak (${count}+ reports)`,
+      badgeClass: 'badge-brick',
+      ruleText: `[Condition: N >= 25] ${count} complaints submitted for this location. Automatic escalation to CRITICAL (2-Hour Emergency SLA).`,
+      reason: `${count} citizens filed concurrent grievances. Triggers emergency municipal commissioner dispatch.`
+    };
+  } else if (count >= 10) {
+    return {
+      conditionMet: 'HIGH_VOLUME_CLUSTER',
+      minPriority: 'High',
+      scoreBoost: 20,
+      slaHours: 6,
+      badgeLabel: `🔥 High Cluster (${count} reports)`,
+      badgeClass: 'badge-brick',
+      ruleText: `[Condition: 10 <= N < 25] ${count} complaints submitted. Escalates priority score by +20 (High Priority / 6-Hour SLA).`,
+      reason: `Multi-household cluster of ${count} reports indicates active infrastructure failure.`
+    };
+  } else if (count >= 3) {
+    return {
+      conditionMet: 'NEIGHBORHOOD_CLUSTER',
+      minPriority: 'Medium',
+      scoreBoost: 10,
+      slaHours: 24,
+      badgeLabel: `👥 Neighborhood Cluster (${count} reports)`,
+      badgeClass: 'badge-ochre',
+      ruleText: `[Condition: 3 <= N < 10] Neighborhood cluster of ${count} reports (+10 priority boost / 24-Hour SLA).`,
+      reason: `Neighborhood consensus verified with ${count} citizen reports.`
+    };
+  } else if (count === 2) {
+    return {
+      conditionMet: 'VERIFIED_DUPLICATE',
+      minPriority: 'Low',
+      scoreBoost: 5,
+      slaHours: 48,
+      badgeLabel: `✓ Duplicate Verified (2 reports)`,
+      badgeClass: 'badge-blue',
+      ruleText: `[Condition: N = 2] Verified duplicate confirmed by neighbor (+5 priority boost).`,
+      reason: `Second citizen confirmed identical issue within 500m.`
+    };
+  } else {
+    return {
+      conditionMet: 'STANDALONE',
+      minPriority: 'Low',
+      scoreBoost: 0,
+      slaHours: 72,
+      badgeLabel: `Standalone (1 report)`,
+      badgeClass: 'badge-moss',
+      ruleText: `[Condition: N = 1] Single standalone report. Baseline priority evaluation applied.`,
+      reason: `Single citizen report pending neighborhood verification.`
+    };
+  }
+}
 
 /**
  * 1. Normalize Multilingual Text
@@ -165,10 +228,11 @@ export function classifyComplaint(text) {
 }
 
 /**
- * 3. Explainable Priority Scoring (Rule-based + Weighted Math Equation)
+ * 3. Explainable Priority Scoring (Rule-based + Weighted Math Equation + Volume Multipliers)
  */
 export function calculatePriority(text, location = '', clusterCount = 1) {
   const clean = (text + ' ' + location).toLowerCase();
+  const volumeRule = evaluateVolumePriorityCondition(clusterCount);
 
   // Check safety-critical rules first
   for (const crit of CRITICAL_KEYWORDS) {
@@ -176,8 +240,10 @@ export function calculatePriority(text, location = '', clusterCount = 1) {
       return {
         priority: 'Critical',
         score: 98,
+        volumeRule,
         explanation: [
           `Contains safety-critical risk trigger: "${crit}".`,
+          volumeRule.ruleText,
           'Direct hazard to life and public safety.',
           'Immediate emergency dispatch protocol activated.'
         ],
@@ -190,20 +256,37 @@ export function calculatePriority(text, location = '', clusterCount = 1) {
     }
   }
 
+  // Check mass volume conditional outbreak (N >= 25)
+  if (volumeRule.conditionMet === 'MASS_OUTBREAK') {
+    return {
+      priority: 'Critical',
+      score: Math.min(94 + Math.min(clusterCount - 25, 5), 99),
+      volumeRule,
+      explanation: [
+        volumeRule.ruleText,
+        'High affected population factor: 25+ citizen complaints received in localized radius.',
+        'Escalated to Municipal Commissioner and Emergency Operations.'
+      ],
+      recommended_action: [
+        'Deploy emergency response tanker/crew immediately within 2 hours.',
+        'Broadcast automated SMS to all linked citizen tickets.',
+        'Post real-time GPS resolution milestone.'
+      ]
+    };
+  }
+
   // Math Formula: PriorityScore = 0.35S + 0.20A + 0.15D + 0.15F + 0.15C
   let S = 45; // Safety severity
   let A = 40; // Affected population
   let D = 30; // Duration
-  let F = Math.min(clusterCount * 12, 90); // Frequency
+  let F = Math.min(clusterCount * 14, 95); // Frequency multiplier
   let C = 30; // Critical location factor
   let explanation = [];
 
   // Check sensitive zones
-  let detectedZone = null;
   for (const zone of SENSITIVE_ZONES) {
     if (clean.includes(zone.keyword)) {
       C = 95;
-      detectedZone = zone.name;
       explanation.push(`Reported location is adjacent to sensitive ${zone.name}.`);
       break;
     }
@@ -222,22 +305,23 @@ export function calculatePriority(text, location = '', clusterCount = 1) {
     explanation.push('Issue duration spans multiple consecutive days without resolution.');
   }
 
-  if (clusterCount > 1) {
-    explanation.push(`${clusterCount} grouped citizen reports received for this localized issue.`);
-  }
+  // Volume-based condition explanation
+  explanation.push(volumeRule.ruleText);
 
-  const score = Math.min(Math.round(0.35 * S + 0.20 * A + 0.15 * D + 0.15 * F + 0.15 * C), 99);
+  let rawScore = Math.round(0.35 * S + 0.20 * A + 0.15 * D + 0.15 * F + 0.15 * C) + volumeRule.scoreBoost;
+  let score = Math.min(Math.max(rawScore, volumeRule.conditionMet === 'HIGH_VOLUME_CLUSTER' ? 82 : 40), 99);
 
   let priority = 'Low';
-  if (score >= 82) priority = 'High';
-  else if (score >= 55) priority = 'Medium';
+  if (score >= 82 || volumeRule.minPriority === 'High') priority = 'High';
+  else if (score >= 55 || volumeRule.minPriority === 'Medium') priority = 'Medium';
 
   return {
     priority,
     score,
+    volumeRule,
     explanation: explanation.length > 0 ? explanation : ['Standard civic service request.', 'Within normal department SLA queue.'],
     recommended_action: [
-      'Inspect site within standard ward timeline.',
+      `Inspect site within ${volumeRule.slaHours} hours SLA.`,
       'Assign field technician.',
       'Notify citizen upon milestone completion.'
     ]

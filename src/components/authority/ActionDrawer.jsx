@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { OFFICERS } from '../../data/mockData';
+import { evaluateVolumePriorityCondition } from '../../services/aiEngine';
 import { Sparkles, X, ArrowRight } from 'lucide-react';
 
 export const ActionDrawer = ({ complaint, onClose }) => {
@@ -99,6 +100,23 @@ export const ActionDrawer = ({ complaint, onClose }) => {
               </ul>
             </div>
           )}
+
+          {/* Volume Priority Condition Box */}
+          {(() => {
+            const count = complaint.similarCount || complaint.upvotes || 1;
+            const volumeRule = evaluateVolumePriorityCondition(count);
+            return (
+              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 6, padding: '10px 12px', marginBottom: 14, fontSize: '11.5px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <strong style={{ color: 'var(--ink)' }}>Volume-Based Priority Multiplier:</strong>
+                  <span className={`badge ${volumeRule.badgeClass}`} style={{ fontSize: '10.5px' }}>
+                    {volumeRule.badgeLabel}
+                  </span>
+                </div>
+                <div style={{ color: 'var(--ink-soft)' }}>{volumeRule.ruleText}</div>
+              </div>
+            );
+          })()}
 
           {/* Action Form */}
           <div style={{ borderTop: '1px dashed var(--line)', paddingTop: 14, marginTop: 8 }}>

@@ -1,6 +1,6 @@
 /* ==========================================================================
    JanSetu AI Unified Master Stylesheet
-   Import Design System, Citizen, Authority and Auth CSS
+   Full-Width Responsive Desktop & Mobile Styling
    ========================================================================== */
 
 @import '../css/design-system.css';
@@ -8,18 +8,72 @@
 @import '../css/authority.css';
 @import '../css/auth.css';
 
-/* Global resets for React root */
+/* Full-width responsive resets for HTML & Body */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--paper);
+  font-family: var(--font-sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
 #root {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .jansetu-app {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: var(--paper);
+}
+
+/* Full Width Desktop Layout for Citizen Shell (Removes 480px constraint on desktop) */
+@media (min-width: 768px) {
+  body.citizen-body {
+    padding: 0 !important;
+    background: var(--paper) !important;
+    display: block !important;
+  }
+
+  .shell {
+    max-width: 1100px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 100vh !important;
+  }
+
+  .topbar {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .user-profile-strip {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .shell {
+    max-width: 1240px !important;
+  }
+
+  .topbar, .user-profile-strip {
+    max-width: 1240px !important;
+  }
 }
 
 .hidden-mobile {

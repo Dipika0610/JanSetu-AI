@@ -25,6 +25,7 @@ export const AuthHub = ({ onAuthenticated, onBack }) => {
 
   // Staff Form State
   const [staffEmail, setStaffEmail] = useState('s.kulkarni@municipalcorp.gov.in');
+  const [staffPasscode, setStaffPasscode] = useState('');
   const [staffName, setStaffName] = useState('Anand Deshmukh');
   const [staffEmpId, setStaffEmpId] = useState('MCGM-ENG-9102');
   const [staffDept, setStaffDept] = useState('sanitation');
@@ -71,12 +72,16 @@ export const AuthHub = ({ onAuthenticated, onBack }) => {
   };
 
   const handleStaffLogin = () => {
+    if (staffPasscode.trim() !== '12345678') {
+      showToast('Access Denied: Invalid 8-Digit Security Access Code! (Required: 12345678)', 'warning');
+      return;
+    }
     const officer = loginStaff({
       email: staffEmail,
       name: staffEmail.includes('kulkarni') ? 'S. Kulkarni' : 'JE Nilesh Patil',
       designation: staffEmail.includes('kulkarni') ? 'Ward Executive Officer' : 'Junior Engineer (Sanitation)'
     });
-    showToast(`Signed in as ${officer.name} (${officer.designation})`, 'success');
+    showToast(`Security Passcode Verified! Signed in as ${officer.name}`, 'success');
     onAuthenticated('authority');
   };
 
@@ -399,8 +404,16 @@ export const AuthHub = ({ onAuthenticated, onBack }) => {
                   />
                 </div>
                 <div className="field">
-                  <label>{t('password')} <span className="req">*</span></label>
-                  <input type="password" value="••••••••" readOnly />
+                  <label>Official Security Access Code (8-Digits) <span className="req">*</span></label>
+                  <input
+                    type="password"
+                    maxLength="8"
+                    value={staffPasscode}
+                    onChange={(e) => setStaffPasscode(e.target.value)}
+                    placeholder="Enter 12345678"
+                    style={{ letterSpacing: '2px', fontFamily: 'monospace' }}
+                  />
+                  <div className="field-hint">Required for official command center authorization: <strong>12345678</strong></div>
                 </div>
 
                 <button

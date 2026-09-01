@@ -8,6 +8,7 @@ import { MetricsStrip } from './MetricsStrip';
 import { PriorityQueue } from './PriorityQueue';
 import { DuplicateClusters } from './DuplicateClusters';
 import { GISHotspotMap } from './GISHotspotMap';
+import { AnalyticsView } from './AnalyticsView';
 import { ActionDrawer } from './ActionDrawer';
 import { MobileBottomNav } from './MobileBottomNav';
 import {
@@ -402,33 +403,9 @@ export const AuthorityDashboard = ({ onViewChange }) => {
           </div>
         )}
 
-        {/* 6. ANALYTICS & IMPACT VIEW */}
+        {/* 6. ANALYTICS & IMPACT VIEW WITH MULTI-COLORED DEPARTMENT GRAPH (Weekly, Monthly, Yearly) */}
         {activeSection === 'analytics' && (
-          <div className="animate-fade-in panel" style={{ marginTop: 14 }}>
-            <div className="panel-head">
-              <div>
-                <h2>{t('analyticsImpact')}</h2>
-                <span className="hint">Municipal AI resolution telemetry and officer productivity metrics</span>
-              </div>
-            </div>
-            <div style={{ padding: '18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px' }}>
-                <div style={{ fontSize: '12px', color: 'var(--ink-soft)' }}>Duplicate Reduction Rate</div>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--moss)', marginTop: 4 }}>76.4%</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink-faint)', marginTop: 2 }}>612 reports merged into single work orders</div>
-              </div>
-              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px' }}>
-                <div style={{ fontSize: '12px', color: 'var(--ink-soft)' }}>Officer Hours Saved / Week</div>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--blue)', marginTop: 4 }}>4.9 hrs</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink-faint)', marginTop: 2 }}>Eliminated redundant site inspections</div>
-              </div>
-              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px' }}>
-                <div style={{ fontSize: '12px', color: 'var(--ink-soft)' }}>Citizen Satisfaction Rating</div>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--ochre-dim)', marginTop: 4 }}>4.7 ★</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink-faint)', marginTop: 2 }}>Across 1,280 verified resolution SMS alerts</div>
-              </div>
-            </div>
-          </div>
+          <AnalyticsView />
         )}
       </main>
 

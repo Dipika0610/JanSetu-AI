@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { WARDS } from '../../data/mockData';
+import { WARDS, CATEGORIES } from '../../data/mockData';
 import { Sidebar } from './Sidebar';
 import { MetricsStrip } from './MetricsStrip';
 import { PriorityQueue } from './PriorityQueue';
@@ -10,11 +10,31 @@ import { DuplicateClusters } from './DuplicateClusters';
 import { GISHotspotMap } from './GISHotspotMap';
 import { ActionDrawer } from './ActionDrawer';
 import { MobileBottomNav } from './MobileBottomNav';
-import { Menu, Search, Download, Globe, ChevronDown, LogOut, User } from 'lucide-react';
+import {
+  Menu,
+  Search,
+  Download,
+  Globe,
+  ChevronDown,
+  LogOut,
+  User,
+  ListOrdered,
+  GitMerge,
+  MapPin,
+  Building2,
+  BarChart3,
+  Flame,
+  ArrowRight,
+  CheckCircle2,
+  TrendingUp,
+  ShieldCheck
+} from 'lucide-react';
 
 export const AuthorityDashboard = ({ onViewChange }) => {
   const { currentUser, logout } = useAuth();
   const {
+    complaints,
+    clusters,
     selectedWard,
     setSelectedWard,
     searchQuery,
@@ -23,7 +43,8 @@ export const AuthorityDashboard = ({ onViewChange }) => {
   } = useGrievances();
   const { lang, setLanguage, t } = useLanguage();
 
-  const [activeSection, setActiveSection] = useState('queue');
+  // Default to 'overview' so that Priority Queue is only visible when explicitly clicked
+  const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -43,12 +64,26 @@ export const AuthorityDashboard = ({ onViewChange }) => {
     onViewChange('auth');
   };
 
+  const getSectionTitle = () => {
+    switch (activeSection) {
+      case 'queue': return t('priorityQueue');
+      case 'clusters': return t('duplicateClusters');
+      case 'map': return t('hotspotMap');
+      case 'departments': return t('departments');
+      case 'analytics': return t('analyticsImpact');
+      default: return t('overview');
+    }
+  };
+
   return (
     <div className="app">
       {/* Sidebar / Mobile Drawer */}
       <Sidebar
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onSectionChange={(sec) => {
+          setActiveSection(sec);
+          setSidebarOpen(false);
+        }}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onViewChange={onViewChange}
@@ -66,7 +101,7 @@ export const AuthorityDashboard = ({ onViewChange }) => {
             <Menu size={18} />
           </button>
 
-          <h1>{t('priorityQueue')}</h1>
+          <h1>{getSectionTitle()}</h1>
 
           <div className="search">
             <Search size={14} />
@@ -252,32 +287,155 @@ export const AuthorityDashboard = ({ onViewChange }) => {
         {/* Executive Metrics Row */}
         <MetricsStrip />
 
-        {/* 2-Column Body Grid */}
-        <div className="body-grid">
-          {/* Left Panel: Priority Queue */}
-          <PriorityQueue onSelectComplaint={(item) => setSelectedComplaint(item)} />
+        {/* ================= CONDITIONAL VIEW SWITCHER ================= */}
 
-          {/* Right Stack: GIS Map & Duplicate Clusters */}
-          <aside className="side-stack">
-            <GISHotspotMap />
+        {/* 1. PRIORITY QUEUE VIEW: Visible ONLY when "Priority Queue" option is clicked */}
+        {activeSection === 'queue' && (
+          <div className="animate-fade-in" style={{ marginTop: 14 }}>
+            <PriorityQueue onSelectComplaint={(item) => setSelectedComplaint(item)} />
+          </div>
+        )}
+
+        {/* 2. OVERVIEW DASHBOARD VIEW */}
+        {activeSection === 'overview' && (
+          <div className="animate-fade-in" style={{ marginTop: 14 }}>
+            {/* Quick Action Banner to Open Priority Queue */}
+            <div
+              style={{
+                background: 'var(--card)',
+                border: '1.5px solid var(--brick)',
+                borderRadius: 8,
+                padding: '14px 18px',
+                marginBottom: 16,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 12,
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--brick)', fontWeight: 700, fontSize: '13.5px' }}>
+                  <Flame size={16} />
+                  <span>Incoming Priority Dispatch Queue Active</span>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--ink-soft)', marginTop: 2 }}>
+                  {complaints.length} grievances dynamically evaluated and sorted by volume frequency &amp; severity.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => setActiveSection('queue')}
+                style={{
+                  margin: 0,
+                  width: 'auto',
+                  padding: '8px 14px',
+                  fontSize: '12.5px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6
+                }}
+              >
+                <ListOrdered size={14} />
+                <span>Open Priority Queue ({complaints.length})</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+
+            {/* 2-Column Overview Grid: Hotspot Map & Duplicate Clusters */}
+            <div className="body-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <GISHotspotMap />
+              <DuplicateClusters />
+            </div>
+          </div>
+        )}
+
+        {/* 3. DUPLICATE CLUSTERS VIEW */}
+        {activeSection === 'clusters' && (
+          <div className="animate-fade-in" style={{ marginTop: 14 }}>
             <DuplicateClusters />
-          </aside>
-        </div>
+          </div>
+        )}
+
+        {/* 4. HOTSPOT MAP VIEW */}
+        {activeSection === 'map' && (
+          <div className="animate-fade-in" style={{ marginTop: 14 }}>
+            <GISHotspotMap />
+          </div>
+        )}
+
+        {/* 5. DEPARTMENTS & SLA ROUTING MATRIX VIEW */}
+        {activeSection === 'departments' && (
+          <div className="animate-fade-in panel" style={{ marginTop: 14 }}>
+            <div className="panel-head">
+              <div>
+                <h2>{t('departments')} &amp; SLA Routing Matrix</h2>
+                <span className="hint">Department accountability and escalation mapping (SIH26-S02 Module 7)</span>
+              </div>
+            </div>
+            <div style={{ padding: '16px' }}>
+              <table className="queue-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Subcategory Issue</th>
+                    <th>Responsible Department</th>
+                    <th>Escalation Authority</th>
+                    <th>Target SLA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CATEGORIES.map(cat => (
+                    <tr key={cat.id}>
+                      <td><strong>{cat.name}</strong></td>
+                      <td style={{ color: 'var(--ink-soft)' }}>{cat.subcategory}</td>
+                      <td><span className="badge badge-blue">{cat.department}</span></td>
+                      <td><span className="badge badge-ochre">{cat.escalationDept}</span></td>
+                      <td><span className="badge badge-moss">24 - 48 Hours</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 6. ANALYTICS & IMPACT VIEW */}
+        {activeSection === 'analytics' && (
+          <div className="animate-fade-in panel" style={{ marginTop: 14 }}>
+            <div className="panel-head">
+              <div>
+                <h2>{t('analyticsImpact')}</h2>
+                <span className="hint">Municipal AI resolution telemetry and officer productivity metrics</span>
+              </div>
+            </div>
+            <div style={{ padding: '18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--ink-soft)' }}>Duplicate Reduction Rate</div>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--moss)', marginTop: 4 }}>76.4%</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink-faint)', marginTop: 2 }}>612 reports merged into single work orders</div>
+              </div>
+              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--ink-soft)' }}>Officer Hours Saved / Week</div>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--blue)', marginTop: 4 }}>4.9 hrs</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink-faint)', marginTop: 2 }}>Eliminated redundant site inspections</div>
+              </div>
+              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--ink-soft)' }}>Citizen Satisfaction Rating</div>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--ochre-dim)', marginTop: 4 }}>4.7 ★</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink-faint)', marginTop: 2 }}>Across 1,280 verified resolution SMS alerts</div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Mobile Bottom Quick App Navigation Bar */}
       <MobileBottomNav
         activeSection={activeSection}
-        onSectionChange={(sec) => {
-          setActiveSection(sec);
-          if (sec === 'clusters') {
-            document.getElementById('duplicateClustersPanel')?.scrollIntoView({ behavior: 'smooth' });
-          } else if (sec === 'map') {
-            document.getElementById('hotspotMapPanel')?.scrollIntoView({ behavior: 'smooth' });
-          } else {
-            document.getElementById('priorityQueuePanel')?.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
+        onSectionChange={(sec) => setActiveSection(sec)}
         onViewChange={onViewChange}
       />
 

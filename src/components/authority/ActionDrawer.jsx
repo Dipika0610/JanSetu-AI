@@ -3,7 +3,7 @@ import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { OFFICERS } from '../../data/mockData';
 import { evaluateVolumePriorityCondition } from '../../services/aiEngine';
-import { Sparkles, X, ArrowRight } from 'lucide-react';
+import { Sparkles, X, ArrowRight, Flame, Users, Clock, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export const ActionDrawer = ({ complaint, onClose }) => {
   const { updateComplaintStatus } = useGrievances();
@@ -14,6 +14,23 @@ export const ActionDrawer = ({ complaint, onClose }) => {
   const [actionNotes, setActionNotes] = useState(complaint?.notes || '');
 
   if (!complaint) return null;
+
+  const count = (complaint.similarCount || 0) > 0 ? complaint.similarCount : (complaint.upvotes || 1);
+  const volumeRule = evaluateVolumePriorityCondition(count);
+
+  let decidedPriority = complaint.priority;
+  let decidedScore = complaint.priorityScore || 50;
+
+  if (count >= 25) {
+    decidedPriority = 'Critical';
+    decidedScore = Math.max(decidedScore, 94);
+  } else if (count >= 10) {
+    if (decidedPriority === 'Low' || decidedPriority === 'Medium') decidedPriority = 'High';
+    decidedScore = Math.max(decidedScore, 82);
+  } else if (count >= 3) {
+    if (decidedPriority === 'Low') decidedPriority = 'Medium';
+    decidedScore = Math.max(decidedScore, 65);
+  }
 
   const handleSave = () => {
     updateComplaintStatus(complaint.id, {
@@ -40,6 +57,56 @@ export const ActionDrawer = ({ complaint, onClose }) => {
         </div>
 
         <div className="modal-body">
+          {/* Volume Decision Engine Breakdown Callout */}
+          <div
+            style={{
+              background: count >= 25 ? 'var(--brick-soft)' : count >= 10 ? 'var(--brick-soft)' : 'var(--card)',
+              border: `1.5px solid ${count >= 25 ? 'var(--brick)' : count >= 10 ? 'var(--brick-dim)' : 'var(--line)'}`,
+              borderRadius: 8,
+              padding: '12px 14px',
+              marginBottom: 14
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, fontSize: '13px', color: count >= 10 ? 'var(--brick)' : 'var(--blue)' }}>
+                {count >= 10 ? <Flame size={16} /> : <Users size={16} />}
+                <span>Volume Priority Decision Breakdown</span>
+              </div>
+              <span
+                style={{
+                  background: count >= 25 ? 'var(--brick)' : count >= 10 ? 'var(--brick-dim)' : 'var(--ochre)',
+                  color: '#fff',
+                  padding: '3px 8px',
+                  borderRadius: 12,
+                  fontSize: '11px',
+                  fontWeight: 700
+                }}
+              >
+                {count} Reports Counted
+              </span>
+            </div>
+
+            <div style={{ fontSize: '12px', color: 'var(--ink-soft)', lineHeight: 1.45, marginBottom: 8 }}>
+              <strong>Condition Evaluated:</strong> {volumeRule.ruleText}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: '11.5px', background: 'var(--paper)', padding: '8px 10px', borderRadius: 6 }}>
+              <div>
+                <span style={{ color: 'var(--ink-faint)' }}>Decided Priority:</span><br />
+                <strong style={{ color: decidedPriority === 'Critical' ? 'var(--brick)' : decidedPriority === 'High' ? 'var(--brick-dim)' : 'var(--moss)', fontSize: '12.5px' }}>
+                  {decidedPriority.toUpperCase()} (Score: {decidedScore}/100)
+                </strong>
+              </div>
+              <div>
+                <span style={{ color: 'var(--ink-faint)' }}>Target SLA Response:</span><br />
+                <strong style={{ color: 'var(--blue)', fontSize: '12.5px' }}>
+                  <Clock size={12} style={{ display: 'inline', marginRight: 3 }} />
+                  {volumeRule.slaHours} Hours Emergency
+                </strong>
+              </div>
+            </div>
+          </div>
+
           {/* Attached Photo */}
           {complaint.photo && (
             <div style={{ marginBottom: 14 }}>
@@ -83,8 +150,8 @@ export const ActionDrawer = ({ complaint, onClose }) => {
             </div>
             <div>
               <label className="field-label">{t('priorityScoreLabel')}</label>
-              <div className={`badge ${complaint.priority === 'Critical' || complaint.priority === 'High' ? 'badge-brick' : 'badge-ochre'}`} style={{ fontSize: '11.5px' }}>
-                {complaint.priority.toUpperCase()} (Score: {complaint.priorityScore} / 100)
+              <div className={`badge ${decidedPriority === 'Critical' || decidedPriority === 'High' ? 'badge-brick' : 'badge-ochre'}`} style={{ fontSize: '11.5px' }}>
+                {decidedPriority.toUpperCase()} (Score: {decidedScore} / 100)
               </div>
             </div>
           </div>
@@ -100,23 +167,6 @@ export const ActionDrawer = ({ complaint, onClose }) => {
               </ul>
             </div>
           )}
-
-          {/* Volume Priority Condition Box */}
-          {(() => {
-            const count = complaint.similarCount || complaint.upvotes || 1;
-            const volumeRule = evaluateVolumePriorityCondition(count);
-            return (
-              <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 6, padding: '10px 12px', marginBottom: 14, fontSize: '11.5px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <strong style={{ color: 'var(--ink)' }}>Volume-Based Priority Multiplier:</strong>
-                  <span className={`badge ${volumeRule.badgeClass}`} style={{ fontSize: '10.5px' }}>
-                    {volumeRule.badgeLabel}
-                  </span>
-                </div>
-                <div style={{ color: 'var(--ink-soft)' }}>{volumeRule.ruleText}</div>
-              </div>
-            );
-          })()}
 
           {/* Action Form */}
           <div style={{ borderTop: '1px dashed var(--line)', paddingTop: 14, marginTop: 8 }}>

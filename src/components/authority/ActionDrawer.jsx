@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useGrievances } from '../../context/GrievanceContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { OFFICERS } from '../../data/mockData';
+import { OFFICERS, WARDS, CATEGORIES } from '../../data/mockData';
 import { evaluateVolumePriorityCondition } from '../../services/aiEngine';
-import { Sparkles, X, ArrowRight, Flame, Users, Clock, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Sparkles, X, ArrowRight, Flame, Users, Clock, CheckCircle2, ShieldAlert, MapPin, Building2 } from 'lucide-react';
 
 export const ActionDrawer = ({ complaint, onClose }) => {
   const { updateComplaintStatus } = useGrievances();
@@ -11,6 +11,8 @@ export const ActionDrawer = ({ complaint, onClose }) => {
 
   const [assignedOfficer, setAssignedOfficer] = useState(complaint?.assignedTo || '');
   const [status, setStatus] = useState(complaint?.status || 'assigned');
+  const [selectedWard, setSelectedWard] = useState(complaint?.ward || 'Andheri West');
+  const [selectedDept, setSelectedDept] = useState(complaint?.department || 'Drainage & Sewage');
   const [actionNotes, setActionNotes] = useState(complaint?.notes || '');
 
   if (!complaint) return null;
@@ -36,6 +38,8 @@ export const ActionDrawer = ({ complaint, onClose }) => {
     updateComplaintStatus(complaint.id, {
       assignedTo: assignedOfficer || null,
       status: status,
+      ward: selectedWard,
+      department: selectedDept,
       notes: actionNotes || null
     });
     onClose();
@@ -140,35 +144,49 @@ export const ActionDrawer = ({ complaint, onClose }) => {
             </div>
           )}
 
-          {/* Ward & Priority Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+          {/* Dynamic Ward & Department Re-Routing Options */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div>
-              <label className="field-label">{t('wardLocationLabel')}</label>
-              <div style={{ fontSize: '12.5px', color: 'var(--ink-soft)', fontWeight: 500 }}>
-                {complaint.location || complaint.ward}
-              </div>
+              <label className="field-label" htmlFor="editWardSelect">
+                <MapPin size={12} style={{ display: 'inline', marginRight: 3 }} />
+                Assigned Ward (GIS Dynamic)
+              </label>
+              <select
+                id="editWardSelect"
+                className="select-ctrl"
+                style={{ width: '100%' }}
+                value={selectedWard}
+                onChange={(e) => setSelectedWard(e.target.value)}
+              >
+                {WARDS.map(w => (
+                  <option key={w.id} value={w.name}>{w.name}</option>
+                ))}
+              </select>
             </div>
+
             <div>
-              <label className="field-label">{t('priorityScoreLabel')}</label>
-              <div className={`badge ${decidedPriority === 'Critical' || decidedPriority === 'High' ? 'badge-brick' : 'badge-ochre'}`} style={{ fontSize: '11.5px' }}>
-                {decidedPriority.toUpperCase()} (Score: {decidedScore} / 100)
-              </div>
+              <label className="field-label" htmlFor="editDeptSelect">
+                <Building2 size={12} style={{ display: 'inline', marginRight: 3 }} />
+                Department Routing
+              </label>
+              <select
+                id="editDeptSelect"
+                className="select-ctrl"
+                style={{ width: '100%' }}
+                value={selectedDept}
+                onChange={(e) => setSelectedDept(e.target.value)}
+              >
+                <option value="Drainage & Sewage">Drainage &amp; Sewage</option>
+                <option value="Water Supply">Water Supply</option>
+                <option value="Roads & Traffic">Roads &amp; Traffic</option>
+                <option value="Streetlights & Power">Streetlights &amp; Power</option>
+                <option value="Garbage & Waste">Garbage &amp; Waste</option>
+                <option value="Public Works & Safety">Public Works &amp; Safety</option>
+              </select>
             </div>
           </div>
 
-          {/* Explainable AI Details */}
-          {complaint.explanation && (
-            <div style={{ background: 'var(--paper)', borderRadius: 6, padding: '10px 12px', marginBottom: 14, fontSize: '11.8px' }}>
-              <strong style={{ color: 'var(--blue)' }}>{t('explainableAiRationale')}</strong>
-              <ul style={{ paddingLeft: 16, marginTop: 4, color: 'var(--ink-soft)' }}>
-                {complaint.explanation.map((e, idx) => (
-                  <li key={idx}>{e}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Action Form */}
+          {/* Action Form: Officer Assignment & Status */}
           <div style={{ borderTop: '1px dashed var(--line)', paddingTop: 14, marginTop: 8 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
               <div>
